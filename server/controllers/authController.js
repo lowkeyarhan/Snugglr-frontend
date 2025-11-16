@@ -11,7 +11,6 @@ export const register = async (req, res) => {
       email,
       phoneNumber,
       password,
-      community,
       birthday,
       gender,
       pronouns,
@@ -28,9 +27,8 @@ export const register = async (req, res) => {
       });
     }
 
-    // Use defaults for name and community if not provided (will be filled in onboarding)
+    // Use default for name if not provided (will be filled in onboarding)
     const userName = name || "User";
-    const userCommunity = community || "Pending";
 
     // Verify email domain is allowed
     const emailDomain = email.split("@")[1]?.toLowerCase();
@@ -54,6 +52,9 @@ export const register = async (req, res) => {
         emailDomain,
       });
     }
+
+    // Automatically set community based on email domain
+    const userCommunity = allowedDomain.institutionName;
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {

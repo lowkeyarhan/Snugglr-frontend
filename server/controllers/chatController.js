@@ -114,7 +114,6 @@ export const sendMessage = async (req, res) => {
 
     await message.populate("sender", "name username image");
 
-    // Create notification for the other user in the chat
     const recipient = chat.users.find(
       (userId) => userId.toString() !== currentUserId.toString()
     );
@@ -139,9 +138,8 @@ export const sendMessage = async (req, res) => {
         );
       } catch (notifError) {
         console.error(
-          `❌ Error creating message notification: ${notifError.message}`
+          `Error creating message notification: ${notifError.message}`
         );
-        // Don't fail the request if notification creation fails
       }
     }
 
@@ -174,7 +172,6 @@ export const submitGuess = async (req, res) => {
       });
     }
 
-    // Verify chat exists
     const chat = await Chat.findById(chatId).populate("users");
     if (!chat) {
       return res.status(404).json({
@@ -183,7 +180,6 @@ export const submitGuess = async (req, res) => {
       });
     }
 
-    // Check if chat is already revealed
     if (chat.revealed) {
       return res.status(400).json({
         success: false,
@@ -191,52 +187,52 @@ export const submitGuess = async (req, res) => {
       });
     }
 
-    // Save guess to user's guesses array
     const user = await User.findById(currentUserId);
+    if (!user.guesses) {
+      user.guesses = [];
+    }
 
-    // Check if user already guessed for this chat
     const existingGuessIndex = user.guesses.findIndex(
       (g) => g.chatId.toString() === chatId
     );
 
     if (existingGuessIndex !== -1) {
-      // Update existing guess
       user.guesses[existingGuessIndex].guess = guess;
     } else {
-      // Add new guess
       user.guesses.push({ chatId, guess });
     }
 
     await user.save();
 
-    // Check if both users have submitted guesses
     const otherUser = chat.users.find(
       (u) => u._id.toString() !== currentUserId.toString()
     );
+
+    const otherUserFull = await User.findById(otherUser._id);
+    if (!otherUserFull.guesses) {
+      otherUserFull.guesses = [];
+    }
 
     const currentUserGuess = user.guesses.find(
       (g) => g.chatId.toString() === chatId
     );
 
-    const otherUserGuess = otherUser.guesses.find(
+    const otherUserGuess = otherUserFull.guesses.find(
       (g) => g.chatId.toString() === chatId
     );
 
-    // If both users have guessed, check if they're correct
     if (currentUserGuess && otherUserGuess) {
       const currentUserCorrect =
         otherUserGuess.guess.toLowerCase().trim() ===
         user.name.toLowerCase().trim();
       const otherUserCorrect =
         currentUserGuess.guess.toLowerCase().trim() ===
-        otherUser.name.toLowerCase().trim();
+        otherUserFull.name.toLowerCase().trim();
 
-      // Both guesses must be correct to reveal
       if (currentUserCorrect && otherUserCorrect) {
         chat.revealed = true;
         await chat.save();
 
-        // Create identity revealed notifications for both users
         try {
           const io = req.app.get("io");
           await createAndEmitNotification(
@@ -245,7 +241,7 @@ export const submitGuess = async (req, res) => {
               sender: otherUser._id,
               type: "identity_revealed",
               title: "Identities Revealed! 🎉",
-              message: `You and ${otherUser.name} guessed correctly!`,
+              message: `You and ${otherUserFull.name} guessed correctly!`,
               relatedChat: chatId,
               actionUrl: `/chat/${chatId}`,
             },
@@ -281,7 +277,6 @@ export const submitGuess = async (req, res) => {
           },
         });
       } else {
-        // At least one guess is wrong
         return res.status(200).json({
           success: true,
           message: "Both guessed, but at least one guess is incorrect",
@@ -294,7 +289,6 @@ export const submitGuess = async (req, res) => {
       }
     }
 
-    // Only current user has guessed so far
     res.status(200).json({
       success: true,
       message: "Guess submitted successfully",
@@ -314,11 +308,6 @@ export const submitGuess = async (req, res) => {
   }
 };
 
-/**
- * Get reveal status of a chat
- * GET /api/chat/:chatId/reveal-status
- * Protected route
- */
 export const getRevealStatus = async (req, res) => {
   try {
     const { chatId } = req.params;
@@ -336,7 +325,7 @@ export const getRevealStatus = async (req, res) => {
       success: true,
       data: {
         revealed: chat.revealed,
-        users: chat.revealed ? chat.users : null, // Only send user data if revealed
+        users: chat.revealed ? chat.users : null,
       },
     });
   } catch (error) {

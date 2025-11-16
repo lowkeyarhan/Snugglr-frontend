@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
-import { getCurrentUser, updateUserProfile } from "../utils/api";
+import { getCurrentUser, updateUserProfile } from "../API/api";
 
 export default function Profile() {
   const [formData, setFormData] = useState({

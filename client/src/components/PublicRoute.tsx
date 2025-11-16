@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import type { ReactElement } from "react";
-import { isAuthenticated } from "../utils/auth";
+import { isAuthenticated } from "../API/auth";
 
 interface PublicRouteProps {
   children: ReactElement;

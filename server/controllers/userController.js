@@ -130,11 +130,22 @@ export const updateSettings = async (req, res) => {
 export const getPotentialMatches = async (req, res) => {
   try {
     const currentUserId = req.user._id;
-    const userCommunity = req.user.community;
+    const currentUserEmail = req.user.email;
     const currentUserGender = req.user.gender;
+
+    // Extract email domain from current user's email
+    const emailDomain = currentUserEmail.split("@")[1];
+
+    console.log("🔍 Getting potential matches for user:", {
+      userId: currentUserId,
+      email: currentUserEmail,
+      emailDomain: emailDomain,
+      gender: currentUserGender,
+    });
 
     // If user hasn't set their gender, return empty results
     if (!currentUserGender) {
+      console.log("❌ User has no gender set");
       return res.status(200).json({
         success: true,
         data: {
@@ -143,14 +154,28 @@ export const getPotentialMatches = async (req, res) => {
       });
     }
 
+    // Get all matches where:
+    // 1. Current user initiated the swipe (user1), OR
+    // 2. Status is "matched" (mutual match - should be hidden from both)
     const existingMatches = await Match.find({
-      $or: [{ user1: currentUserId }, { user2: currentUserId }],
+      $or: [
+        { user1: currentUserId }, // Current user already swiped
+        {
+          $or: [{ user1: currentUserId }, { user2: currentUserId }],
+          status: "matched", // Mutual matches
+        },
+      ],
     });
 
+    // Extract user IDs to exclude
     const swipedUserIds = existingMatches.map((match) =>
       match.user1.toString() === currentUserId.toString()
         ? match.user2
         : match.user1
+    );
+
+    console.log(
+      `📝 Excluding ${swipedUserIds.length} users (already swiped or matched)`
     );
 
     // Determine opposite gender for filtering
@@ -161,19 +186,41 @@ export const getPotentialMatches = async (req, res) => {
       oppositeGender = "male";
     } else {
       // For "other" gender, we'll allow matching with all genders
-      // You can modify this logic based on your requirements
       oppositeGender = { $in: ["male", "female", "other"] };
     }
+
+    console.log(
+      `🔎 Searching for users with gender: ${JSON.stringify(oppositeGender)}`
+    );
+
+    // Create regex pattern to match email domain
+    const emailDomainPattern = new RegExp(
+      `@${emailDomain.replace(".", "\\.")}$`,
+      "i"
+    );
+
+    // First, check how many users exist with the same email domain and opposite gender
+    const totalOppositeGenderInDomain = await User.countDocuments({
+      email: emailDomainPattern,
+      gender: oppositeGender,
+      _id: { $ne: currentUserId },
+    });
+
+    console.log(
+      `👥 Total ${oppositeGender} users with @${emailDomain}: ${totalOppositeGenderInDomain}`
+    );
 
     const potentialMatches = await User.find({
       _id: {
         $nin: [...swipedUserIds, currentUserId],
       },
-      community: userCommunity,
+      email: emailDomainPattern,
       gender: oppositeGender,
     })
       .select("-password -guesses")
       .limit(20);
+
+    console.log(`✅ Found ${potentialMatches.length} potential matches`);
 
     res.status(200).json({
       success: true,
@@ -182,7 +229,7 @@ export const getPotentialMatches = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(`Get Potential Matches Error: ${error.message}`);
+    console.error(`❌ Get Potential Matches Error: ${error.message}`);
     res.status(500).json({
       success: false,
       message: "Error fetching potential matches",

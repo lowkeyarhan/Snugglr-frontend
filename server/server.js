@@ -12,6 +12,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import confessionRoutes from "./routes/confessionRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import domainRoutes from "./routes/domainRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import errorHandler from "./utils/errorHandler.js";
 import chatSocket from "./sockets/chatSocket.js";
 import notificationSocket from "./sockets/notificationSocket.js";
@@ -55,6 +56,7 @@ app.use("/api/chat", chatRoutes);
 app.use("/api/confessions", confessionRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/domains", domainRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.use((req, res) => {
   res.status(404).json({

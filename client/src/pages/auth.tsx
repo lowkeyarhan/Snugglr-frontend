@@ -1,6 +1,6 @@
 // Import React hooks and API functions
 import { useState } from "react";
-import { loginUser, registerUser } from "../utils/api";
+import { loginUser, registerUser } from "../API/api";
 
 type LoginMethod = "email" | "phone";
 

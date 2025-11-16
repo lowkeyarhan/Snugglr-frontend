@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { isAuthenticated } from "../utils/auth";
+import { isAuthenticated } from "../API/auth";
 
 export default function NotFound() {
   const navigate = useNavigate();

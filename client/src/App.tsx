@@ -6,8 +6,10 @@ import Landing from "./pages/landing";
 import Onboarding from "./pages/onboarding";
 import Profile from "./pages/profile";
 import Settings from "./pages/settings";
+import Admin from "./pages/admin";
 import NotFound from "./pages/notFound";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 import PublicRoute from "./components/PublicRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
@@ -16,7 +18,14 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         {/* Public routes - accessible without authentication */}
-        <Route path="/" element={<Landing />} />
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Landing />
+            </PublicRoute>
+          }
+        />
         <Route
           path="/auth"
           element={
@@ -73,6 +82,14 @@ export default function App() {
             <ProtectedRoute>
               <Create />
             </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
           }
         />
 

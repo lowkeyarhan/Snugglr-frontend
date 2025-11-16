@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import { createConfession } from "../utils/api";
+import { createConfession } from "../API/api";
 
 export default function Create() {
   const navigate = useNavigate();

@@ -1,5 +1,8 @@
 import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 import universityLogo from "../assets/university-logo.png";
+import { checkAdminStatus } from "../API/api";
+import { getAuthToken } from "../API/auth";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -9,17 +12,54 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [isAdmin, setIsAdmin] = useState(() => {
+    const cached = localStorage.getItem("isAdmin");
+    return cached === "true";
+  });
+
   const userProfileImage =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuB3_iPJIQrt9-mW5A2ydCh3Yxc4LvljOrKyoltkptN-cVP6DbgD5zAnr4dEs77kaw5Z8IqCaskYDyn_nJ-7e1EQD6Mb6OXgIyrvFZGK4vcEV_4flgPXBJhCJYP4RWJgmdloYhBZdEczYdkPD91Lbxip2szT9kOihSNg5cv4LAw4gFIEslHasQHpUQwZvWBs8cSEUqlKhDBI0KtNhHEcGz1lzukeOzUbX5Zg0W62uoUsmn7g8g5pIk7t8OIfrlI8EmzJYYxJH5A9BR92";
 
-  const navItems = [
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const token = getAuthToken();
+        if (token) {
+          const lastCheck = localStorage.getItem("adminCheckTimestamp");
+          const now = Date.now();
+          const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+
+          if (!lastCheck || now - parseInt(lastCheck) > cacheExpiry) {
+            const response = await checkAdminStatus(token);
+            setIsAdmin(response.isAdmin);
+            localStorage.setItem("isAdmin", response.isAdmin.toString());
+            localStorage.setItem("adminCheckTimestamp", now.toString());
+          }
+        }
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+      }
+    };
+
+    checkAdmin();
+  }, []);
+
+  const allNavItems = [
     { icon: "home", label: "Home", path: "/home" },
     { icon: "chat_bubble", label: "Chats", path: "/chat" },
     { icon: "lightbulb", label: "Hints", path: "/hints" },
     { icon: "add_box", label: "Create", path: "/create" },
     { icon: "settings", label: "Settings", path: "/settings" },
     { icon: "account_circle", label: "Profile", path: "/profile" },
+    {
+      icon: "admin_panel_settings",
+      label: "Admin",
+      path: "/admin",
+      adminOnly: true,
+    },
   ];
+
+  const navItems = allNavItems.filter((item) => !item.adminOnly || isAdmin);
 
   const notifications = [
     {

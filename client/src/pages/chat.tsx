@@ -7,8 +7,8 @@ import {
   submitGuess,
   getRevealStatus,
   getCurrentUser,
-} from "../utils/api";
-import { getAuthToken } from "../utils/auth";
+} from "../API/api";
+import { getAuthToken } from "../API/auth";
 
 // Types
 interface Chat {

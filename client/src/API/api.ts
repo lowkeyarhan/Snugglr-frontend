@@ -691,4 +691,34 @@ export const getRevealStatus = async (
   }
 };
 
+export const checkAdminStatus = async (
+  token: string
+): Promise<{
+  success: boolean;
+  isAdmin: boolean;
+  data: {
+    isAdmin: boolean;
+    role: string | null;
+  };
+}> => {
+  try {
+    const response = await api.get("/api/admin/check-status", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to check admin status"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
 export default api;

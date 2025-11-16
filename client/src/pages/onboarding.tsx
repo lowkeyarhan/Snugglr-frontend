@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateUserProfile } from "../utils/api";
+import { updateUserProfile } from "../API/api";
 
 export default function Onboarding() {
   const [formData, setFormData] = useState({

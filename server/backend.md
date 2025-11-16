@@ -22,8 +22,10 @@ server/
 │   └── token.js           # JWT configuration
 ├── controllers/           # Business logic controllers
 │   ├── authController.js  # Authentication logic
+│   ├── adminController.js # Admin domain management
 │   ├── chatController.js  # Chat management
 │   ├── confessionController.js # Confession system
+│   ├── domainController.js # Domain verification
 │   ├── matchController.js # Matching algorithm
 │   ├── userController.js  # User management
 │   └── notificationController.js # Notifications
@@ -38,8 +40,12 @@ server/
 │   └── Notification.js   # User notifications
 ├── routes/               # API route definitions
 │   ├── authRoutes.js     # Authentication endpoints
+│   ├── adminRoutes.js    # Admin endpoints
 │   ├── chatRoutes.js     # Chat endpoints
+│   ├── confessionRoutes.js # Confession endpoints
+│   ├── domainRoutes.js   # Domain endpoints
 │   ├── matchRoutes.js    # Matching endpoints
+│   ├── notificationRoutes.js # Notification endpoints
 │   └── userRoutes.js     # User endpoints
 ├── sockets/              # Socket.io handlers
 │   ├── chatSocket.js     # Real-time chat
@@ -132,98 +138,77 @@ server/
 ### **Authentication Routes** (`/api/auth`)
 
 ```
-POST   /register           # User registration with university email
-POST   /login              # User login with email/password
-POST   /verify             # Email verification
-GET    /me                 # Get current user profile
-PUT    /profile            # Update user profile
-POST   /logout             # User logout
-POST   /refresh            # Refresh JWT token
-POST   /forgot-password    # Password reset request
-POST   /reset-password     # Reset password with token
+POST   /api/auth/register              # User registration with university email
+POST   /api/auth/login                 # User login with email/password
+GET    /api/auth/me                    # Get current user profile (Protected)
+PUT    /api/auth/change-password       # Change user password (Protected)
 ```
 
-### **User Routes** (`/api/users`)
+### **User Routes** (`/api/user`)
 
 ```
-GET    /                   # Get all users (admin only)
-GET    /:id                # Get specific user profile
-PUT    /:id                 # Update user profile
-DELETE /:id                 # Delete user account
-POST   /:id/block           # Block a user
-POST   /:id/unblock         # Unblock a user
-GET    /:id/blocked         # Get blocked users list
-POST   /:id/report          # Report a user
+PUT    /api/user/profile               # Update user profile (Protected)
+PUT    /api/user/settings              # Update user settings (Protected)
+GET    /api/user/potential-matches     # Get potential matches for swiping (Protected)
+GET    /api/user/:userId               # Get specific user profile (Protected)
+GET    /api/user/community/:community  # Get users by community (Protected)
 ```
 
-### **Match Routes** (`/api/matches`)
+### **Match Routes** (`/api/match`)
 
 ```
-POST   /swipe               # Swipe on a user (like/pass)
-GET    /potential           # Get potential matches for swiping
-GET    /my-matches          # Get user's current matches
-GET    /history             # Get swipe history
-POST   /:id/unmatch         # Unmatch with a user
-GET    /stats               # Get matching statistics
+POST   /api/match/swipe                # Swipe on a user (like/pass) (Protected)
+GET    /api/match/matches              # Get user's current matches (Protected)
 ```
 
 ### **Chat Routes** (`/api/chat`)
 
 ```
-GET    /                    # Get user's chat conversations
-GET    /:chatId             # Get specific chat details
-POST   /message             # Send a message to chat
-GET    /:chatId/messages     # Get chat message history
-POST   /:chatId/guess       # Submit identity guess
-POST   /:chatId/reveal       # Reveal identities
-POST   /:chatId/typing       # Send typing indicator
-GET    /:chatId/media       # Get shared media in chat
+GET    /api/chat                       # Get user's chat conversations (Protected)
+GET    /api/chat/:chatId/messages      # Get chat message history (Protected)
+POST   /api/chat/:chatId/message       # Send a message to chat (Protected)
+POST   /api/chat/guess                 # Submit identity guess (Protected)
+GET    /api/chat/:chatId/reveal-status # Get reveal status for chat (Protected)
 ```
 
 ### **Confession Routes** (`/api/confessions`)
 
 ```
-GET    /                    # Get confessions feed with pagination
-POST   /                    # Create new confession
-GET    /:id                 # Get specific confession
-POST   /:id/like            # Like/unlike confession
-POST   /:id/comment         # Comment on confession
-GET    /:id/comments        # Get confession comments
-POST   /:id/report          # Report confession
-DELETE /:id                 # Delete own confession
+POST   /api/confessions                # Create new confession (Protected)
+GET    /api/confessions                # Get confessions feed with pagination (Protected)
+POST   /api/confessions/:confessionId/like    # Like/unlike confession (Protected)
+POST   /api/confessions/:confessionId/comment # Comment on confession (Protected)
+POST   /api/confessions/cleanup        # Manual cleanup of old confessions (Protected)
 ```
 
 ### **Notification Routes** (`/api/notifications`)
 
 ```
-GET    /                    # Get user notifications
-PUT    /:id/read            # Mark notification as read
-PUT    /read-all            # Mark all notifications as read
-DELETE /:id                 # Delete notification
-GET    /unread-count        # Get unread notification count
-POST   /settings            # Update notification preferences
+GET    /api/notifications              # Get user notifications (Protected)
+GET    /api/notifications/unread-count # Get unread notification count (Protected)
+PATCH  /api/notifications/:notificationId/read # Mark notification as read (Protected)
+PATCH  /api/notifications/read-all    # Mark all notifications as read (Protected)
+DELETE /api/notifications/:notificationId     # Delete notification (Protected)
+DELETE /api/notifications/clear-read  # Clear all read notifications (Protected)
 ```
 
 ### **Domain Routes** (`/api/domains`)
 
 ```
-GET    /                    # Get allowed university domains
-POST   /                    # Add new domain (admin only)
-PUT    /:id                 # Update domain (admin only)
-DELETE /:id                 # Remove domain (admin only)
+POST   /api/domains/verify             # Verify if email domain is allowed (Public)
+GET    /api/domains                    # Get allowed university domains (Public)
+GET    /api/domains/:id                # Get specific domain by ID (Public)
 ```
 
 ### **Admin Routes** (`/api/admin`)
 
 ```
-GET    /dashboard           # Admin dashboard statistics
-GET    /users              # Get all users with pagination
-GET    /reports            # Get all user reports
-POST   /users/:id/ban      # Ban/unban user
-POST   /content/:id/remove  # Remove reported content
-GET    /analytics          # Get app analytics
-POST   /announcement       # Send system announcement
+POST   /api/admin/domains              # Add new allowed domain (Protected)
+PUT    /api/admin/domains/:id          # Update allowed domain (Protected)
+DELETE /api/admin/domains/:id          # Delete allowed domain (Protected)
 ```
+
+**Note:** Admin access is verified by checking the user's email against an environment variable containing authorized admin emails. Only users with emails listed in the admin configuration will have access to admin routes.
 
 ## Real-time Systems Explained
 

@@ -5,7 +5,7 @@ import {
   swipeUser,
   getConfessions,
   likeConfession,
-} from "../utils/api";
+} from "../API/api";
 
 // Dummy Stories (no functionality)
 const dummyStories = [

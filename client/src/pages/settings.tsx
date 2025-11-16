@@ -4,7 +4,7 @@ import {
   getCurrentUser,
   updateUserSettings,
   changePassword,
-} from "../utils/api";
+} from "../API/api";
 
 export default function Settings() {
   const [pushNotifications, setPushNotifications] = useState(true);
