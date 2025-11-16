@@ -46,42 +46,6 @@ export const getAllCommunities = async (
   }
 };
 
-//get community by id
-export const getCommunityById = async (
-  id: string,
-  token: string
-): Promise<{
-  success: boolean;
-  data: {
-    domain: {
-      _id: string;
-      institutionName: string;
-      domain: string;
-      isActive: boolean;
-      createdAt: string;
-    };
-  };
-}> => {
-  try {
-    const response = await api.get(`/api/admin/domains/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      throw new Error(
-        error.response.data.message || "Failed to fetch community"
-      );
-    } else if (error.request) {
-      throw new Error("Cannot connect to server. Please try again.");
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
-  }
-};
-
 //delete community
 export const deleteCommunity = async (
   id: string,
@@ -202,42 +166,6 @@ export const getAllUsers = async (
 }> => {
   try {
     const response = await api.get(`/api/admin/users`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      throw new Error(error.response.data.message || "Failed to fetch users");
-    } else if (error.request) {
-      throw new Error("Cannot connect to server. Please try again.");
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
-  }
-};
-
-//get users by community (for admin)
-export const getUsersByCommunity = async (
-  community: string,
-  token: string
-): Promise<{
-  success: boolean;
-  data: {
-    users: Array<{
-      _id: string;
-      username: string;
-      name: string;
-      age: number;
-      gender: string;
-      community: string;
-      email: string;
-    }>;
-  };
-}> => {
-  try {
-    const response = await api.get(`/api/admin/users/community/${community}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

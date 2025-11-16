@@ -6,9 +6,7 @@ import {
   addAdmin,
   checkAdminStatus,
   getAllDomains,
-  getDomainById,
   getAllUsersAdmin,
-  getUsersByCommunity,
   deleteUserAdmin,
 } from "../controllers/adminController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
@@ -20,7 +18,6 @@ router.get("/check-status", authMiddleware, checkAdminStatus);
 
 // Domains CRUD
 router.get("/domains", authMiddleware, getAllDomains);
-router.get("/domains/:id", authMiddleware, getDomainById);
 router.post("/domains", authMiddleware, addDomain);
 router.put("/domains/:id", authMiddleware, updateDomain);
 router.delete("/domains/:id", authMiddleware, deleteDomain);
@@ -30,7 +27,6 @@ router.post("/admins", authMiddleware, addAdmin);
 
 // Users CRUD
 router.get("/users", authMiddleware, getAllUsersAdmin);
-router.get("/users/community/:community", authMiddleware, getUsersByCommunity);
 router.delete("/users/:userId", authMiddleware, deleteUserAdmin);
 
 export default router;

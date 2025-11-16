@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getAllCommunities,
   deleteCommunity,
@@ -32,11 +32,7 @@ export default function Community() {
     isActive: true,
   });
   const [addingCommunity, setAddingCommunity] = useState(false);
-
-  // Fetch communities on mount
-  useEffect(() => {
-    fetchCommunities();
-  }, []);
+  const hasFetched = useRef(false);
 
   const fetchCommunities = async () => {
     try {
@@ -55,6 +51,13 @@ export default function Community() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (!hasFetched.current) {
+      hasFetched.current = true;
+      fetchCommunities();
+    }
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this community?")) {

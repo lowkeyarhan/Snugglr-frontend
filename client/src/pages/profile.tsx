@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import { getCurrentUser, updateUserProfile } from "../API/api";
+import { clearAuth } from "../API/auth";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
@@ -27,8 +28,11 @@ export default function Profile() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
     fetchUserProfile();
   }, []);
 
@@ -155,8 +159,7 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    clearAuth();
     window.location.href = "/auth";
   };
 

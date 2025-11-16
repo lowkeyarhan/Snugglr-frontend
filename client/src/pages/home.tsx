@@ -51,6 +51,8 @@ export default function Home() {
   const [confessions, setConfessions] = useState<any[]>([]);
   const [confessionsLoading, setConfessionsLoading] = useState(true);
   const [confessionsError, setConfessionsError] = useState<string | null>(null);
+  const hasFetchedMatches = useRef(false);
+  const hasFetchedConfessions = useRef(false);
 
   const toggleConfessionLike = async (confessionId: string) => {
     try {
@@ -82,10 +84,18 @@ export default function Home() {
     }
   };
 
-  // Fetch potential matches and confessions on component mount
   useEffect(() => {
-    fetchMatches();
-    fetchConfessions();
+    if (!hasFetchedMatches.current) {
+      hasFetchedMatches.current = true;
+      fetchMatches();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasFetchedConfessions.current) {
+      hasFetchedConfessions.current = true;
+      fetchConfessions();
+    }
   }, []);
 
   const fetchMatches = async () => {

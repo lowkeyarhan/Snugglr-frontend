@@ -32,35 +32,6 @@ export const getAllDomains = async (req, res) => {
   }
 };
 
-export const getDomainById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const domain = await AllowedDomain.findById(id);
-
-    if (!domain) {
-      return res.status(404).json({
-        success: false,
-        message: "Domain not found",
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: {
-        domain,
-      },
-    });
-  } catch (error) {
-    console.error(`Error fetching domain: ${error.message}`);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching domain",
-      error: error.message,
-    });
-  }
-};
-
 export const addDomain = async (req, res) => {
   try {
     const { domain, institutionName, isActive } = req.body;
@@ -287,29 +258,6 @@ export const getAllUsersAdmin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error fetching all users",
-      error: error.message,
-    });
-  }
-};
-
-//get users by community (for admin)
-export const getUsersByCommunity = async (req, res) => {
-  try {
-    const { community } = req.params;
-
-    const users = await User.find({ community }).select("-password -guesses");
-
-    res.status(200).json({
-      success: true,
-      data: {
-        users,
-      },
-    });
-  } catch (error) {
-    console.error(`Error fetching users by community: ${error.message}`);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching users by community",
       error: error.message,
     });
   }

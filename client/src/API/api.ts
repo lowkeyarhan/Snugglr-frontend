@@ -303,32 +303,6 @@ export const swipeUser = async (
 };
 
 /**
- * GET MATCHES
- * Fetches all mutual matches
- * @param token - JWT token for authentication
- * @returns Promise with matches
- */
-export const getMatches = async (token: string): Promise<any> => {
-  try {
-    const response = await api.get("/api/match/matches", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    return response.data;
-  } catch (error: any) {
-    if (error.response) {
-      throw new Error(error.response.data.message || "Failed to fetch matches");
-    } else if (error.request) {
-      throw new Error("Cannot connect to server. Please try again.");
-    } else {
-      throw new Error("An unexpected error occurred");
-    }
-  }
-};
-
-/**
  * CREATE CONFESSION
  * Creates a new confession
  * @param data - Confession data
@@ -501,12 +475,12 @@ export const commentOnConfession = async (
 };
 
 /**
- * GET CHATS
- * Fetches all chats for the current user
+ * GET CHAT ROOMS
+ * Fetches all chat rooms for the current user
  * @param token - JWT token for authentication
  * @returns Promise with chats data
  */
-export const getChats = async (
+export const getChatRooms = async (
   token: string
 ): Promise<{
   success: boolean;
@@ -691,6 +665,12 @@ export const getRevealStatus = async (
   }
 };
 
+/**
+ * CHECK ADMIN STATUS
+ * Checks if the user is an admin
+ * @param token - JWT token for authentication
+ * @returns Promise with admin status
+ */
 export const checkAdminStatus = async (
   token: string
 ): Promise<{

@@ -129,107 +129,56 @@ export const updateSettings = async (req, res) => {
 
 export const getPotentialMatches = async (req, res) => {
   try {
-    const currentUserId = req.user._id;
-    const currentUserEmail = req.user.email;
-    const currentUserGender = req.user.gender;
+    const { _id: userId, email, gender } = req.user;
 
-    // Extract email domain from current user's email
-    const emailDomain = currentUserEmail.split("@")[1];
-
-    console.log("🔍 Getting potential matches for user:", {
-      userId: currentUserId,
-      email: currentUserEmail,
-      emailDomain: emailDomain,
-      gender: currentUserGender,
-    });
-
-    // If user hasn't set their gender, return empty results
-    if (!currentUserGender) {
-      console.log("❌ User has no gender set");
+    if (!gender) {
       return res.status(200).json({
         success: true,
-        data: {
-          users: [],
-        },
+        data: { users: [] },
       });
     }
 
-    // Get all matches where:
-    // 1. Current user initiated the swipe (user1), OR
-    // 2. Status is "matched" (mutual match - should be hidden from both)
-    const existingMatches = await Match.find({
-      $or: [
-        { user1: currentUserId }, // Current user already swiped
-        {
-          $or: [{ user1: currentUserId }, { user2: currentUserId }],
-          status: "matched", // Mutual matches
-        },
-      ],
-    });
-
-    // Extract user IDs to exclude
-    const swipedUserIds = existingMatches.map((match) =>
-      match.user1.toString() === currentUserId.toString()
-        ? match.user2
-        : match.user1
-    );
-
-    console.log(
-      `📝 Excluding ${swipedUserIds.length} users (already swiped or matched)`
-    );
-
-    // Determine opposite gender for filtering
-    let oppositeGender;
-    if (currentUserGender === "male") {
-      oppositeGender = "female";
-    } else if (currentUserGender === "female") {
-      oppositeGender = "male";
-    } else {
-      // For "other" gender, we'll allow matching with all genders
-      oppositeGender = { $in: ["male", "female", "other"] };
-    }
-
-    console.log(
-      `🔎 Searching for users with gender: ${JSON.stringify(oppositeGender)}`
-    );
-
-    // Create regex pattern to match email domain
-    const emailDomainPattern = new RegExp(
+    const emailDomain = email.split("@")[1];
+    const emailPattern = new RegExp(
       `@${emailDomain.replace(".", "\\.")}$`,
       "i"
     );
 
-    // First, check how many users exist with the same email domain and opposite gender
-    const totalOppositeGenderInDomain = await User.countDocuments({
-      email: emailDomainPattern,
-      gender: oppositeGender,
-      _id: { $ne: currentUserId },
+    const oppositeGender =
+      gender === "male"
+        ? "female"
+        : gender === "female"
+        ? "male"
+        : { $in: ["male", "female", "other"] };
+
+    const userSwipedOn = await Match.find({ user1: userId });
+    const mutualMatches = await Match.find({
+      $or: [{ user1: userId }, { user2: userId }],
+      status: "matched",
     });
 
-    console.log(
-      `👥 Total ${oppositeGender} users with @${emailDomain}: ${totalOppositeGenderInDomain}`
-    );
+    const excludedUserIds = [
+      ...userSwipedOn.map((match) => match.user2),
+      ...mutualMatches.map((match) =>
+        match.user1.toString() === userId.toString() ? match.user2 : match.user1
+      ),
+      userId,
+    ];
 
     const potentialMatches = await User.find({
-      _id: {
-        $nin: [...swipedUserIds, currentUserId],
-      },
-      email: emailDomainPattern,
+      _id: { $nin: excludedUserIds },
+      email: emailPattern,
       gender: oppositeGender,
     })
       .select("-password -guesses")
       .limit(20);
 
-    console.log(`✅ Found ${potentialMatches.length} potential matches`);
-
     res.status(200).json({
       success: true,
-      data: {
-        users: potentialMatches,
-      },
+      data: { users: potentialMatches },
     });
   } catch (error) {
-    console.error(`❌ Get Potential Matches Error: ${error.message}`);
+    console.error("Get Potential Matches Error:", error.message);
     res.status(500).json({
       success: false,
       message: "Error fetching potential matches",
@@ -238,31 +187,31 @@ export const getPotentialMatches = async (req, res) => {
   }
 };
 
-export const getUserById = async (req, res) => {
-  try {
-    const { userId } = req.params;
+// export const getUserById = async (req, res) => {
+//   try {
+//     const { userId } = req.params;
 
-    const user = await User.findById(userId).select("-password -guesses");
+//     const user = await User.findById(userId).select("-password -guesses");
 
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found",
-      });
-    }
+//     if (!user) {
+//       return res.status(404).json({
+//         success: false,
+//         message: "User not found",
+//       });
+//     }
 
-    res.status(200).json({
-      success: true,
-      data: {
-        user,
-      },
-    });
-  } catch (error) {
-    console.error(`Get User Error: ${error.message}`);
-    res.status(500).json({
-      success: false,
-      message: "Error fetching user",
-      error: error.message,
-    });
-  }
-};
+//     res.status(200).json({
+//       success: true,
+//       data: {
+//         user,
+//       },
+//     });
+//   } catch (error) {
+//     console.error(`Get User Error: ${error.message}`);
+//     res.status(500).json({
+//       success: false,
+//       message: "Error fetching user",
+//       error: error.message,
+//     });
+//   }
+// };

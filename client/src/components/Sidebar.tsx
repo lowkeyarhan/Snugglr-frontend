@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import universityLogo from "../assets/university-logo.png";
 import { checkAdminStatus } from "../API/api";
 import { getAuthToken } from "../API/auth";
@@ -16,28 +16,36 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
     const cached = localStorage.getItem("isAdmin");
     return cached === "true";
   });
+  const hasCheckedAdmin = useRef(false);
 
   const userProfileImage =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuB3_iPJIQrt9-mW5A2ydCh3Yxc4LvljOrKyoltkptN-cVP6DbgD5zAnr4dEs77kaw5Z8IqCaskYDyn_nJ-7e1EQD6Mb6OXgIyrvFZGK4vcEV_4flgPXBJhCJYP4RWJgmdloYhBZdEczYdkPD91Lbxip2szT9kOihSNg5cv4LAw4gFIEslHasQHpUQwZvWBs8cSEUqlKhDBI0KtNhHEcGz1lzukeOzUbX5Zg0W62uoUsmn7g8g5pIk7t8OIfrlI8EmzJYYxJH5A9BR92";
 
   useEffect(() => {
+    if (hasCheckedAdmin.current) return;
+
     const checkAdmin = async () => {
       try {
         const token = getAuthToken();
         if (token) {
           const lastCheck = localStorage.getItem("adminCheckTimestamp");
           const now = Date.now();
-          const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+          const cacheExpiry = 5 * 60 * 1000;
 
           if (!lastCheck || now - parseInt(lastCheck) > cacheExpiry) {
+            hasCheckedAdmin.current = true;
             const response = await checkAdminStatus(token);
             setIsAdmin(response.isAdmin);
             localStorage.setItem("isAdmin", response.isAdmin.toString());
             localStorage.setItem("adminCheckTimestamp", now.toString());
+          } else {
+            hasCheckedAdmin.current = true;
+            console.log("Using cached admin status");
           }
         }
       } catch (error) {
         console.error("Error checking admin status:", error);
+        hasCheckedAdmin.current = true;
       }
     };
 

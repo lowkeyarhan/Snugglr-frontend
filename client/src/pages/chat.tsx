@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import {
-  getChats,
+  getChatRooms,
   getMessages,
   sendMessage,
   submitGuess,
@@ -84,7 +84,7 @@ export default function Chat() {
         setCurrentUser(userResponse.data?.user);
 
         // Load chats
-        const chatsResponse = await getChats(token);
+        const chatsResponse = await getChatRooms(token);
         setChats(chatsResponse.data.chats);
 
         // Set first chat as active if available
@@ -308,7 +308,7 @@ export default function Chat() {
       setCurrentUser(userResponse.data?.user);
 
       // Refresh chats to get updated revealed status
-      const chatsResponse = await getChats(token);
+      const chatsResponse = await getChatRooms(token);
       setChats(chatsResponse.data.chats);
 
       setGuessInput("");

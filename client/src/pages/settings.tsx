@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
-import {
-  getCurrentUser,
-  updateUserSettings,
-  changePassword,
-} from "../API/api";
+import { clearAuth } from "../API/auth";
+import { getCurrentUser, updateUserSettings, changePassword } from "../API/api";
 
 export default function Settings() {
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -25,9 +22,12 @@ export default function Settings() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState(false);
+  const hasLoaded = useRef(false);
 
-  // Load current settings from backend
   useEffect(() => {
+    if (hasLoaded.current) return;
+    hasLoaded.current = true;
+
     const load = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -94,8 +94,8 @@ export default function Settings() {
   };
 
   const handleLogout = () => {
-    // TODO: Implement logout logic
-    console.log("Logout clicked");
+    clearAuth();
+    window.location.href = "/auth";
   };
 
   // Validation functions

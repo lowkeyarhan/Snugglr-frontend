@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getAllUsers, deleteUser } from "../adminAPI/api";
 import { getAllCommunities } from "../adminAPI/api";
 import { getAuthToken } from "../API/auth";
@@ -57,19 +57,20 @@ export default function Users() {
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showUserModal, setShowUserModal] = useState(false);
+  const hasFetched = useRef(false);
 
-  // Fetch communities and all users on mount
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const fetchInitialData = async () => {
       try {
         const token = getAuthToken();
         if (!token) return;
 
-        // Fetch communities
         const communityResponse = await getAllCommunities(token);
         setCommunities(communityResponse.data.domains);
 
-        // Fetch all users
         setLoading(true);
         const usersResponse = await getAllUsers(token);
         setAllUsers(usersResponse.data.users);
