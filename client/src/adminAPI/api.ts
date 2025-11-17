@@ -348,4 +348,91 @@ export const deleteConfession = async (
   }
 };
 
+//get all comments (for admin)
+export const getAllComments = async (
+  token: string
+): Promise<{
+  success: boolean;
+  count: number;
+  data: {
+    confessions: Array<{
+      _id: string;
+      confession: string;
+      username: string;
+      community: string;
+      likesCount: number;
+      commentsCount: number;
+      createdAt: string;
+      comments: Array<{
+        _id: string;
+        username: string;
+        userId?: string;
+        text: string;
+        createdAt: string;
+        likesCount: number;
+        repliesCount: number;
+        replies: Array<{
+          _id: string;
+          text: string;
+          createdAt: string;
+          username: string;
+          userId?: string;
+          likesCount: number;
+        }>;
+      }>;
+    }>;
+  };
+}> => {
+  try {
+    const response = await api.get("/api/admin/comments", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to fetch comments"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+//delete comment (for admin)
+export const deleteCommentAdmin = async (
+  confessionId: string,
+  commentId: string,
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  try {
+    const response = await api.delete(
+      `/api/admin/comments/${confessionId}/${commentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to delete comment"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
 export default api;

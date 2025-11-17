@@ -570,6 +570,108 @@ export const likeReply = async (req, res) => {
   }
 };
 
+// Get all comments (for admin)
+export const getAllCommentsAdmin = async (req, res) => {
+  try {
+    const confessions = await Confession.find({})
+      .populate("allowedDomain", "institutionName domain")
+      .populate("comments.user", "username name")
+      .populate("comments.replies.user", "username name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    // Return all confessions with their comments (including empty ones)
+    const confessionsWithComments = confessions.map((confession) => {
+      const community =
+        confession.allowedDomain?.institutionName || "Unknown community";
+
+      const formattedComments = (confession.comments || []).map((comment) => ({
+        _id: comment._id,
+        username: comment.user?.username || comment.user?.name || "Anonymous",
+        userId: comment.user?._id,
+        text: comment.text,
+        createdAt: comment.createdAt,
+        likesCount: comment.likesCount || 0,
+        replies: (comment.replies || []).map((reply) => ({
+          _id: reply._id,
+          text: reply.text,
+          createdAt: reply.createdAt,
+          username: reply.user?.username || reply.user?.name || "Anonymous",
+          userId: reply.user?._id,
+          likesCount: reply.likesCount || 0,
+        })),
+        repliesCount: comment.replies ? comment.replies.length : 0,
+      }));
+
+      return {
+        _id: confession._id,
+        confession: confession.confession,
+        username: confession.username,
+        community,
+        likesCount: confession.likesCount || 0,
+        commentsCount: confession.comments?.length || 0,
+        comments: formattedComments,
+        createdAt: confession.createdAt,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      count: confessionsWithComments.length,
+      data: {
+        confessions: confessionsWithComments,
+      },
+    });
+  } catch (error) {
+    console.error(`Error fetching all comments: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching comments",
+      error: error.message,
+    });
+  }
+};
+
+// Delete comment (for admin)
+export const deleteCommentAdmin = async (req, res) => {
+  try {
+    const { confessionId, commentId } = req.params;
+
+    const confession = await Confession.findById(confessionId);
+
+    if (!confession) {
+      return res.status(404).json({
+        success: false,
+        message: "Confession not found",
+      });
+    }
+
+    const comment = confession.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    comment.deleteOne();
+    await confession.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+    });
+  } catch (error) {
+    console.error(`Error deleting comment: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting comment",
+      error: error.message,
+    });
+  }
+};
+
 // Automatic cleanup function to delete confessions older than 10 days
 export const cleanupOldConfessions = async () => {
   try {

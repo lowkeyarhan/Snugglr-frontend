@@ -46,11 +46,11 @@ export default function Admin() {
   ];
 
   return (
-    <div className="flex min-h-screen w-full bg-background-light dark:bg-background-dark font-display">
+    <div className="flex h-screen w-full bg-background-light dark:bg-background-dark font-display overflow-hidden">
       {/* SideNavBar */}
-      <aside className="flex w-64 flex-col bg-white dark:bg-card-dark border-r border-slate-200 dark:border-slate-800 p-2">
+      <aside className="hidden lg:flex w-72 flex-col bg-white dark:bg-slate-950 border-r border-slate-200 dark:border-slate-800 h-screen flex-shrink-0 overflow-hidden">
         <div className="flex flex-col flex-1">
-          <div className="px-4 py-8 flex items-center gap-3">
+          <div className="px-6 py-8 flex items-center gap-3">
             <div className="flex flex-col">
               <h1
                 className="text-3xl font-light tracking-tight"
@@ -60,7 +60,7 @@ export default function Admin() {
               </h1>
             </div>
           </div>
-          <nav className="flex flex-col gap-2">
+          <nav className="flex flex-col gap-2 px-2 pb-4 pt-2">
             {navItems.map((item) => {
               const isActive = activeView === item.view;
               return (
@@ -113,9 +113,9 @@ export default function Admin() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto h-screen">
         {/* Page Content */}
-        <div className="p-8 bg-background-light dark:bg-background-dark min-h-screen">
+        <div className="p-8 bg-background-light dark:bg-background-dark min-h-full">
           {activeView === "dashboard" && <Dashboard />}
           {activeView === "community" && <Community />}
           {activeView === "confessions" && <Confessions />}

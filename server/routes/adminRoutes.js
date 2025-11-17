@@ -14,6 +14,8 @@ import {
 import {
   getAllConfessionsAdmin,
   deleteConfessionAdmin,
+  getAllCommentsAdmin,
+  deleteCommentAdmin,
 } from "../controllers/confessionController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
@@ -46,6 +48,14 @@ router.delete(
   "/confessions/:confessionId",
   adminMiddleware,
   deleteConfessionAdmin
+);
+
+// Comments CRUD
+router.get("/comments", adminMiddleware, getAllCommentsAdmin);
+router.delete(
+  "/comments/:confessionId/:commentId",
+  adminMiddleware,
+  deleteCommentAdmin
 );
 
 export default router;

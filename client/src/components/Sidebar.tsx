@@ -106,20 +106,6 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
           collapsed ? "px-4 py-8 justify-center" : "px-6 py-8"
         }`}
       >
-        <div className="h-8 w-8 text-primary flex-shrink-0">
-          <svg
-            fill="none"
-            viewBox="0 0 48 48"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              clipRule="evenodd"
-              d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
-              fill="currentColor"
-              fillRule="evenodd"
-            />
-          </svg>
-        </div>
         {!collapsed && (
           <h1
             className="text-3xl font-light tracking-tight"
