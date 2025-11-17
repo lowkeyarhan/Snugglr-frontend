@@ -1,5 +1,5 @@
 import { Navigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { ReactElement } from "react";
 import { isAuthenticated, getAuthToken } from "../API/auth";
 import { checkAdminStatus } from "../API/api";
@@ -11,8 +11,12 @@ interface AdminRouteProps {
 export default function AdminRoute({ children }: AdminRouteProps) {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const hasChecked = useRef(false);
 
   useEffect(() => {
+    if (hasChecked.current) return;
+    hasChecked.current = true;
+
     const verifyAdmin = async () => {
       if (!isAuthenticated()) {
         setLoading(false);
@@ -22,8 +26,28 @@ export default function AdminRoute({ children }: AdminRouteProps) {
       try {
         const token = getAuthToken();
         if (token) {
+          // Check cache first
+          const lastCheck = localStorage.getItem("adminCheckTimestamp");
+          const now = Date.now();
+          const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+          const cachedAdmin = localStorage.getItem("isAdmin");
+
+          if (
+            lastCheck &&
+            cachedAdmin !== null &&
+            now - parseInt(lastCheck) < cacheExpiry
+          ) {
+            // Use cached value
+            setIsAdmin(cachedAdmin === "true");
+            setLoading(false);
+            return;
+          }
+
+          // Fetch fresh data
           const response = await checkAdminStatus(token);
           setIsAdmin(response.isAdmin);
+          localStorage.setItem("isAdmin", response.isAdmin.toString());
+          localStorage.setItem("adminCheckTimestamp", now.toString());
         } else {
           setIsAdmin(false);
         }

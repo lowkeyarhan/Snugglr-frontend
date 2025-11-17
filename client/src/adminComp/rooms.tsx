@@ -1,42 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { getAllChats, deleteChat } from "../adminAPI/api";
+
+interface ChatParticipant {
+  _id: string;
+  username: string;
+  name: string;
+}
+
+interface Chat {
+  _id: string;
+  roomId: string;
+  participants: ChatParticipant[];
+  community: string;
+  revealed: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export default function Rooms() {
   const [selectedCommunity, setSelectedCommunity] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const allRooms = [
-    {
-      id: "CR-7812",
-      participants: ["@dreamyPoet", "@sunsetChaser"],
-      community: "Stanford University",
-      revealed: true,
-    },
-    {
-      id: "CR-7813",
-      participants: ["@midnightRider", "@coffeeLover"],
-      community: "New York University",
-      revealed: false,
-    },
-    {
-      id: "CR-7814",
-      participants: ["@techWhiz", "@caliDreamer"],
-      community: "UC Berkeley",
-      revealed: true,
-    },
-    {
-      id: "CR-7815",
-      participants: ["@loneStar", "@foodieExplorer"],
-      community: "UT Austin",
-      revealed: false,
-    },
-  ];
-
-  const communities = [
-    "Stanford University",
-    "University of California, Berkeley",
-    "New York University",
-    "University of Texas at Austin",
-  ];
+  const [allRooms, setAllRooms] = useState<Chat[]>([]);
+  const [communities, setCommunities] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const hasFetched = useRef(false);
 
   const filteredRooms = allRooms.filter((room) => {
     const matchesCommunity =
@@ -44,14 +33,99 @@ export default function Rooms() {
     const matchesSearch =
       !searchQuery ||
       room.participants.some((participant) =>
-        participant.toLowerCase().includes(searchQuery.toLowerCase())
+        participant.username.toLowerCase().includes(searchQuery.toLowerCase())
       ) ||
-      room.id.toLowerCase().includes(searchQuery.toLowerCase());
+      room.roomId.includes(searchQuery);
 
     return matchesCommunity && matchesSearch;
   });
 
   const isSearchFieldDisabled = !selectedCommunity;
+
+  useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+    fetchChats();
+  }, []);
+
+  const fetchChats = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required");
+        return;
+      }
+
+      const response = await getAllChats(token);
+      const chats = response.data.chats;
+      setAllRooms(chats);
+
+      // Extract unique communities
+      const uniqueCommunities = Array.from(
+        new Set(chats.map((chat) => chat.community))
+      ).sort();
+      setCommunities(uniqueCommunities);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch chat rooms");
+      console.error("Error fetching chats:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteRoom = async (chatId: string) => {
+    if (!window.confirm("Are you sure you want to delete this chat room?")) {
+      return;
+    }
+
+    try {
+      setDeleting(chatId);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication required");
+        return;
+      }
+
+      await deleteChat(chatId, token);
+      setAllRooms(allRooms.filter((room) => room._id !== chatId));
+    } catch (err: any) {
+      setError(err.message || "Failed to delete chat room");
+      console.error("Error deleting chat room:", err);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin">
+          <svg
+            className="w-8 h-8 text-primary"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              className="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              strokeWidth="4"
+            ></circle>
+            <path
+              className="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -63,6 +137,12 @@ export default function Rooms() {
           View, search, and filter all anonymous chat rooms.
         </p>
       </header>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+        </div>
+      )}
 
       {/* Filters Section */}
       <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
@@ -161,20 +241,20 @@ export default function Rooms() {
               ) : (
                 filteredRooms.map((room) => (
                   <tr
-                    key={room.id}
+                    key={room._id}
                     className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors"
                   >
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-sm">
-                      #{room.id}
+                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono text-xs break-all">
+                      {room.roomId}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2 flex-wrap">
-                        {room.participants.map((participant, index) => (
+                        {room.participants.map((participant) => (
                           <span
-                            key={index}
+                            key={participant._id}
                             className="inline-block px-2 py-1 text-xs font-medium bg-slate-100 text-slate-700 rounded-full dark:bg-slate-700 dark:text-slate-300"
                           >
-                            {participant}
+                            @{participant.username}
                           </span>
                         ))}
                       </div>
@@ -195,14 +275,13 @@ export default function Rooms() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right">
                       <div className="flex justify-end items-center gap-1">
-                        <button className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors">
+                        <button
+                          disabled={deleting === room._id}
+                          onClick={() => handleDeleteRoom(room._id)}
+                          className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                           <span className="material-symbols-outlined text-xl">
-                            history
-                          </span>
-                        </button>
-                        <button className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
-                          <span className="material-symbols-outlined text-xl">
-                            delete
+                            {deleting === room._id ? "clock" : "delete"}
                           </span>
                         </button>
                       </div>

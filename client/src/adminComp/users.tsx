@@ -180,8 +180,8 @@ export default function Users() {
     <>
       <header className="mb-6">
         <h2 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight">
-          User Management
-        </h2>
+        User Management
+      </h2>
         <p className="text-slate-600 dark:text-slate-400 mt-2 text-base font-normal leading-normal">
           View, search, and filter all registered users.
         </p>
@@ -728,8 +728,8 @@ export default function Users() {
                     </label>
                     <p className="text-slate-900 dark:text-white">
                       {formatDate(selectedUser.updatedAt)}
-                    </p>
-                  </div>
+      </p>
+    </div>
                 </div>
               </div>
             </div>

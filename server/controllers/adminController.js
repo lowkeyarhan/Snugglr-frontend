@@ -1,6 +1,7 @@
 import AllowedDomain from "../models/AllowedDomain.js";
 import Admin from "../models/Admin.js";
 import User from "../models/User.js";
+import Chat from "../models/Chat.js";
 
 export const getAllDomains = async (req, res) => {
   try {
@@ -286,6 +287,73 @@ export const deleteUserAdmin = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error deleting user",
+      error: error.message,
+    });
+  }
+};
+
+//get all chat rooms (for admin)
+export const getAllChatsAdmin = async (req, res) => {
+  try {
+    const chats = await Chat.find({})
+      .populate("users", "username name community")
+      .sort({ createdAt: -1 });
+
+    // Format chats to include user info and revealed status
+    const formattedChats = chats.map((chat) => ({
+      _id: chat._id,
+      roomId: chat._id.toString(),
+      participants: chat.users.map((user) => ({
+        _id: user._id,
+        username: user.username,
+        name: user.name,
+      })),
+      community: chat.users[0]?.community || "N/A",
+      revealed: chat.revealed,
+      createdAt: chat.createdAt,
+      updatedAt: chat.updatedAt,
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: formattedChats.length,
+      data: {
+        chats: formattedChats,
+      },
+    });
+  } catch (error) {
+    console.error(`Error fetching all chats: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching all chats",
+      error: error.message,
+    });
+  }
+};
+
+//delete chat room (for admin)
+export const deleteChatAdmin = async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    const chat = await Chat.findByIdAndDelete(chatId);
+
+    if (!chat) {
+      return res.status(404).json({
+        success: false,
+        message: "Chat room not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Chat room deleted successfully",
+    });
+  } catch (error) {
+    console.error(`Error deleting chat room: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting chat room",
       error: error.message,
     });
   }

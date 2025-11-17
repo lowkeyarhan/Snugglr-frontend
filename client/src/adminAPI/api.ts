@@ -208,4 +208,74 @@ export const deleteUser = async (
   }
 };
 
+//get all chat rooms (for admin)
+export const getAllChats = async (
+  token: string
+): Promise<{
+  success: boolean;
+  count: number;
+  data: {
+    chats: Array<{
+      _id: string;
+      roomId: string;
+      participants: Array<{
+        _id: string;
+        username: string;
+        name: string;
+      }>;
+      community: string;
+      revealed: boolean;
+      createdAt: string;
+      updatedAt: string;
+    }>;
+  };
+}> => {
+  try {
+    const response = await api.get("/api/admin/chats", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to fetch chat rooms"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+//delete chat room (for admin)
+export const deleteChat = async (
+  chatId: string,
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  try {
+    const response = await api.delete(`/api/admin/chats/${chatId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to delete chat room"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
 export default api;

@@ -8,25 +8,32 @@ import {
   getAllDomains,
   getAllUsersAdmin,
   deleteUserAdmin,
+  getAllChatsAdmin,
+  deleteChatAdmin,
 } from "../controllers/adminController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
+import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-// Admin Status
+// Admin Status (only needs auth, not admin verification)
 router.get("/check-status", authMiddleware, checkAdminStatus);
 
 // Domains CRUD
-router.get("/domains", authMiddleware, getAllDomains);
-router.post("/domains", authMiddleware, addDomain);
-router.put("/domains/:id", authMiddleware, updateDomain);
-router.delete("/domains/:id", authMiddleware, deleteDomain);
+router.get("/domains", adminMiddleware, getAllDomains);
+router.post("/domains", adminMiddleware, addDomain);
+router.put("/domains/:id", adminMiddleware, updateDomain);
+router.delete("/domains/:id", adminMiddleware, deleteDomain);
 
 // Admins CRUD
-router.post("/admins", authMiddleware, addAdmin);
+router.post("/admins", adminMiddleware, addAdmin);
 
 // Users CRUD
-router.get("/users", authMiddleware, getAllUsersAdmin);
-router.delete("/users/:userId", authMiddleware, deleteUserAdmin);
+router.get("/users", adminMiddleware, getAllUsersAdmin);
+router.delete("/users/:userId", adminMiddleware, deleteUserAdmin);
+
+// Chat Rooms CRUD
+router.get("/chats", adminMiddleware, getAllChatsAdmin);
+router.delete("/chats/:chatId", adminMiddleware, deleteChatAdmin);
 
 export default router;

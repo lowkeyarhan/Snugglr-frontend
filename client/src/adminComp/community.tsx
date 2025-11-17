@@ -128,7 +128,7 @@ export default function Community() {
   };
 
   const handleAddCommunity = async (e: React.FormEvent) => {
-    e.preventDefault();
+        e.preventDefault();
 
     if (!newCommunity.institutionName.trim() || !newCommunity.domain.trim()) {
       setError("Please fill in all fields");
@@ -200,9 +200,9 @@ export default function Community() {
           className="h-12 bg-primary text-white font-semibold px-6 rounded-xl flex items-center justify-center gap-2 hover:bg-primary/90 active:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:ring-offset-2 dark:focus:ring-offset-slate-900 transition-all text-[15px] whitespace-nowrap shadow-sm hover:shadow-md active:shadow-sm"
         >
           <span className="material-symbols-outlined text-xl">add</span>
-          <span>Add New Community</span>
-        </button>
-      </div>
+            <span>Add New Community</span>
+          </button>
+        </div>
 
       {/* Add Community Modal */}
       {showAddModal && (
@@ -286,7 +286,7 @@ export default function Community() {
                 >
                   Active Community
                 </label>
-              </div>
+      </div>
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
@@ -416,11 +416,11 @@ export default function Community() {
                 </tr>
               ) : (
                 filteredCommunities.map((community) => (
-                  <tr
+                <tr
                     key={community._id}
-                    className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-900 dark:text-white font-medium">
+                  className="hover:bg-slate-50 dark:hover:bg-slate-900/30 transition-colors"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-slate-900 dark:text-white font-medium">
                       {editingId === community._id ? (
                         <input
                           type="text"
@@ -453,10 +453,10 @@ export default function Community() {
                       ) : (
                         community.domain
                       )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-slate-600 dark:text-slate-400">
                       {formatDate(community.createdAt)}
-                    </td>
+                  </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -467,9 +467,9 @@ export default function Community() {
                       >
                         {community.isActive ? "Active" : "Inactive"}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <div className="flex justify-end items-center gap-2">
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right">
+                    <div className="flex justify-end items-center gap-2">
                         {editingId === community._id ? (
                           <>
                             <button
@@ -501,24 +501,24 @@ export default function Community() {
                               className="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-900/50 transition-colors"
                               title="Edit"
                             >
-                              <span className="material-symbols-outlined text-xl">
-                                edit
-                              </span>
-                            </button>
+                        <span className="material-symbols-outlined text-xl">
+                          edit
+                        </span>
+                      </button>
                             <button
                               onClick={() => handleDelete(community._id)}
                               className="text-red-500 hover:text-red-700 dark:hover:text-red-400 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
                               title="Delete"
                             >
-                              <span className="material-symbols-outlined text-xl">
-                                delete
-                              </span>
-                            </button>
+                        <span className="material-symbols-outlined text-xl">
+                          delete
+                        </span>
+                      </button>
                           </>
                         )}
-                      </div>
-                    </td>
-                  </tr>
+                    </div>
+                  </td>
+                </tr>
                 ))
               )}
             </tbody>

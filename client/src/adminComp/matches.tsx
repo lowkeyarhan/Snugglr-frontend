@@ -55,8 +55,8 @@ export default function Matches() {
     <>
       <header className="mb-6">
         <h2 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tight">
-          Matches Management
-        </h2>
+        Matches Management
+      </h2>
         <p className="text-slate-600 dark:text-slate-400 mt-2 text-base font-normal leading-normal">
           View, search, and filter all matches between anonymous users.
         </p>
@@ -198,7 +198,7 @@ export default function Matches() {
             </tbody>
           </table>
         </div>
-      </div>
+    </div>
     </>
   );
 }
