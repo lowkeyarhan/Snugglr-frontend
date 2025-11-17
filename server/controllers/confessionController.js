@@ -95,6 +95,7 @@ export const getConfessions = async (req, res) => {
       .limit(limit * 1)
       .skip((page - 1) * limit)
       .populate("comments.user", "username name image")
+      .populate("comments.replies.user", "username name image")
       .populate("allowedDomain", "domain institutionName")
       .lean();
 
@@ -341,6 +342,234 @@ export const commentOnConfession = async (req, res) => {
   }
 };
 
+// Like/unlike comment
+export const likeComment = async (req, res) => {
+  try {
+    const { confessionId, commentId } = req.params;
+    const userId = req.user._id;
+
+    const confession = await Confession.findById(confessionId);
+
+    if (!confession) {
+      return res.status(404).json({
+        success: false,
+        message: "Confession not found",
+      });
+    }
+
+    const comment = confession.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    // Check if user has already liked this comment
+    const hasLiked = comment.likedBy
+      ? comment.likedBy.some((id) => id.toString() === userId.toString())
+      : false;
+    let action = "";
+
+    // Initialize likedBy array if it doesn't exist
+    if (!comment.likedBy) {
+      comment.likedBy = [];
+    }
+
+    if (hasLiked) {
+      // Unlike: remove user from likedBy array and decrement count
+      comment.likedBy = comment.likedBy.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+      comment.likesCount = Math.max(0, comment.likesCount - 1);
+      action = "unliked";
+    } else {
+      // Like: add user to likedBy array and increment count
+      comment.likedBy.push(userId);
+      comment.likesCount += 1;
+      action = "liked";
+    }
+
+    await confession.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Comment ${action}`,
+      data: {
+        likesCount: comment.likesCount,
+        hasLiked: !hasLiked,
+      },
+    });
+  } catch (error) {
+    console.error(`Error liking comment: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error liking comment",
+      error: error.message,
+    });
+  }
+};
+
+// Reply to comment
+export const replyToComment = async (req, res) => {
+  try {
+    const { confessionId, commentId } = req.params;
+    const { text } = req.body;
+    const userId = req.user._id;
+
+    if (!text || text.trim() === "") {
+      return res.status(400).json({
+        success: false,
+        message: "Reply text is required",
+      });
+    }
+
+    const confession = await Confession.findById(confessionId);
+
+    if (!confession) {
+      return res.status(404).json({
+        success: false,
+        message: "Confession not found",
+      });
+    }
+
+    const comment = confession.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    // Check if user's domain matches confession's domain
+    const userEmail = req.user.email;
+    const emailDomain = userEmail.split("@")[1]?.toLowerCase();
+
+    const userAllowedDomain = await AllowedDomain.findOne({
+      domain: emailDomain,
+      isActive: true,
+    });
+
+    if (
+      !userAllowedDomain ||
+      confession.allowedDomain.toString() !== userAllowedDomain._id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Cannot reply to comments from other domains",
+      });
+    }
+
+    comment.replies.push({
+      user: userId,
+      text: text.trim(),
+    });
+
+    await confession.save();
+
+    const populatedConfession = await Confession.findById(confessionId)
+      .populate("comments.user", "username name image")
+      .populate("comments.replies.user", "username name image")
+      .lean();
+
+    const populatedComment = populatedConfession.comments.find(
+      (c) => c._id.toString() === commentId
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "Reply added successfully",
+      data: {
+        replies: populatedComment.replies,
+        repliesCount: populatedComment.replies.length,
+      },
+    });
+  } catch (error) {
+    console.error(`Error adding reply: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error adding reply",
+      error: error.message,
+    });
+  }
+};
+
+// Like/unlike reply
+export const likeReply = async (req, res) => {
+  try {
+    const { confessionId, commentId, replyId } = req.params;
+    const userId = req.user._id;
+
+    const confession = await Confession.findById(confessionId);
+
+    if (!confession) {
+      return res.status(404).json({
+        success: false,
+        message: "Confession not found",
+      });
+    }
+
+    const comment = confession.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comment not found",
+      });
+    }
+
+    const reply = comment.replies.id(replyId);
+    if (!reply) {
+      return res.status(404).json({
+        success: false,
+        message: "Reply not found",
+      });
+    }
+
+    // Check if user has already liked this reply
+    const hasLiked = reply.likedBy
+      ? reply.likedBy.some((id) => id.toString() === userId.toString())
+      : false;
+    let action = "";
+
+    // Initialize likedBy array if it doesn't exist
+    if (!reply.likedBy) {
+      reply.likedBy = [];
+    }
+
+    if (hasLiked) {
+      // Unlike: remove user from likedBy array and decrement count
+      reply.likedBy = reply.likedBy.filter(
+        (id) => id.toString() !== userId.toString()
+      );
+      reply.likesCount = Math.max(0, reply.likesCount - 1);
+      action = "unliked";
+    } else {
+      // Like: add user to likedBy array and increment count
+      reply.likedBy.push(userId);
+      reply.likesCount += 1;
+      action = "liked";
+    }
+
+    await confession.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Reply ${action}`,
+      data: {
+        likesCount: reply.likesCount,
+        hasLiked: !hasLiked,
+      },
+    });
+  } catch (error) {
+    console.error(`Error liking reply: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error liking reply",
+      error: error.message,
+    });
+  }
+};
+
 // Automatic cleanup function to delete confessions older than 10 days
 export const cleanupOldConfessions = async () => {
   try {
@@ -375,6 +604,71 @@ export const manualCleanup = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error during cleanup",
+      error: error.message,
+    });
+  }
+};
+
+// Get all confessions (for admin)
+export const getAllConfessionsAdmin = async (req, res) => {
+  try {
+    const confessions = await Confession.find({})
+      .populate("allowedDomain", "institutionName domain")
+      .populate("comments.user", "username name")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const formattedConfessions = confessions.map((confession) => ({
+      _id: confession._id,
+      confession: confession.confession,
+      username: confession.username,
+      community: confession.allowedDomain?.institutionName || "N/A",
+      domain: confession.allowedDomain?.domain || "N/A",
+      likesCount: confession.likesCount,
+      commentsCount: confession.comments?.length || 0,
+      createdAt: confession.createdAt,
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: formattedConfessions.length,
+      data: {
+        confessions: formattedConfessions,
+      },
+    });
+  } catch (error) {
+    console.error(`Error fetching all confessions: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error fetching confessions",
+      error: error.message,
+    });
+  }
+};
+
+// Delete confession (for admin)
+export const deleteConfessionAdmin = async (req, res) => {
+  try {
+    const { confessionId } = req.params;
+
+    const confession = await Confession.findByIdAndDelete(confessionId);
+
+    if (!confession) {
+      return res.status(404).json({
+        success: false,
+        message: "Confession not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Confession deleted successfully",
+    });
+  } catch (error) {
+    console.error(`Error deleting confession: ${error.message}`);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting confession",
       error: error.message,
     });
   }

@@ -475,6 +475,140 @@ export const commentOnConfession = async (
 };
 
 /**
+ * LIKE COMMENT
+ * Likes/unlikes a comment on a confession
+ * @param confessionId - The confession ID
+ * @param commentId - The comment ID to like
+ * @param token - JWT token for authentication
+ * @returns Promise with like result
+ */
+export const likeComment = async (
+  confessionId: string,
+  commentId: string,
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+  data: {
+    likesCount: number;
+    hasLiked: boolean;
+  };
+}> => {
+  try {
+    const response = await api.post(
+      `/api/confessions/${confessionId}/comment/${commentId}/like`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to like comment");
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+/**
+ * REPLY TO COMMENT
+ * Adds a reply to a comment
+ * @param confessionId - The confession ID
+ * @param commentId - The comment ID to reply to
+ * @param data - Reply data
+ * @param token - JWT token for authentication
+ * @returns Promise with reply result
+ */
+export const replyToComment = async (
+  confessionId: string,
+  commentId: string,
+  data: {
+    text: string;
+  },
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+  data: {
+    replies: any[];
+    repliesCount: number;
+  };
+}> => {
+  try {
+    const response = await api.post(
+      `/api/confessions/${confessionId}/comment/${commentId}/reply`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to reply to comment"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+/**
+ * LIKE REPLY
+ * Likes/unlikes a reply on a comment
+ * @param confessionId - The confession ID
+ * @param commentId - The comment ID
+ * @param replyId - The reply ID to like
+ * @param token - JWT token for authentication
+ * @returns Promise with like result
+ */
+export const likeReply = async (
+  confessionId: string,
+  commentId: string,
+  replyId: string,
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+  data: {
+    likesCount: number;
+    hasLiked: boolean;
+  };
+}> => {
+  try {
+    const response = await api.post(
+      `/api/confessions/${confessionId}/comment/${commentId}/reply/${replyId}/like`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(error.response.data.message || "Failed to like reply");
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+/**
  * GET CHAT ROOMS
  * Fetches all chat rooms for the current user
  * @param token - JWT token for authentication

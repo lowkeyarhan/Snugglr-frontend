@@ -1,10 +1,15 @@
 import { useState, useEffect, useRef } from "react";
+import type { FormEvent } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   getPotentialMatches,
   swipeUser,
   getConfessions,
   likeConfession,
+  commentOnConfession,
+  likeComment,
+  replyToComment,
+  likeReply,
 } from "../API/api";
 
 // Dummy Stories (no functionality)
@@ -45,6 +50,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [swiping, setSwiping] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const carouselRef = useRef<HTMLDivElement | null>(null);
 
   // Confessions state
@@ -53,6 +59,17 @@ export default function Home() {
   const [confessionsError, setConfessionsError] = useState<string | null>(null);
   const hasFetchedMatches = useRef(false);
   const hasFetchedConfessions = useRef(false);
+  const [isCommentModalOpen, setCommentModalOpen] = useState(false);
+  const [activeConfession, setActiveConfession] = useState<any | null>(null);
+  const [newComment, setNewComment] = useState("");
+  const [commentSubmitting, setCommentSubmitting] = useState(false);
+  const [commentError, setCommentError] = useState<string | null>(null);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replySubmitting, setReplySubmitting] = useState(false);
+  const [expandedComments, setExpandedComments] = useState<Set<string>>(
+    new Set()
+  );
 
   const toggleConfessionLike = async (confessionId: string) => {
     try {
@@ -82,6 +99,352 @@ export default function Home() {
       console.error("Error liking confession:", err);
       setConfessionsError(err.message || "Failed to like confession");
     }
+  };
+
+  const openCommentModal = (confession: any) => {
+    setActiveConfession(confession);
+    setNewComment("");
+    setCommentError(null);
+    setCommentModalOpen(true);
+  };
+
+  const closeCommentModal = () => {
+    setCommentModalOpen(false);
+    setActiveConfession(null);
+    setNewComment("");
+    setCommentError(null);
+    setReplyingTo(null);
+    setReplyText("");
+    setExpandedComments(new Set());
+  };
+
+  const handleCommentSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!activeConfession) return;
+    const trimmedComment = newComment.trim();
+    if (!trimmedComment) {
+      setCommentError("Please enter a comment before posting.");
+      return;
+    }
+
+    try {
+      setCommentSubmitting(true);
+      setCommentError(null);
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setCommentError("Please login first.");
+        return;
+      }
+
+      const response = await commentOnConfession(
+        activeConfession._id,
+        { text: trimmedComment },
+        token
+      );
+
+      if (response.success) {
+        const updatedComments = response.data.comments || [];
+        const updatedCount =
+          response.data.commentsCount ?? updatedComments.length;
+
+        const processedComments = processCommentsWithLikeState(
+          updatedComments,
+          currentUserId
+        );
+
+        setConfessions((prev) =>
+          prev.map((confession) =>
+            confession._id === activeConfession._id
+              ? {
+                  ...confession,
+                  comments: processedComments,
+                  commentsCount: updatedCount,
+                }
+              : confession
+          )
+        );
+
+        setActiveConfession((prev: any) =>
+          prev
+            ? {
+                ...prev,
+                comments: processedComments,
+                commentsCount: updatedCount,
+              }
+            : prev
+        );
+
+        setNewComment("");
+      }
+    } catch (err: any) {
+      console.error("Error adding comment:", err);
+      setCommentError(err.message || "Failed to add comment.");
+    } finally {
+      setCommentSubmitting(false);
+    }
+  };
+
+  const toggleCommentLike = async (commentId: string) => {
+    if (!activeConfession) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await likeComment(
+        activeConfession._id,
+        commentId,
+        token
+      );
+
+      if (response.success) {
+        // Update the active confession
+        setActiveConfession((prev: any) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            comments: prev.comments.map((comment: any) =>
+              comment._id === commentId
+                ? {
+                    ...comment,
+                    likesCount: response.data.likesCount,
+                    hasLiked: response.data.hasLiked,
+                  }
+                : comment
+            ),
+          };
+        });
+
+        // Update confessions list
+        setConfessions((prev) =>
+          prev.map((confession) =>
+            confession._id === activeConfession._id
+              ? {
+                  ...confession,
+                  comments: confession.comments.map((comment: any) =>
+                    comment._id === commentId
+                      ? {
+                          ...comment,
+                          likesCount: response.data.likesCount,
+                          hasLiked: response.data.hasLiked,
+                        }
+                      : comment
+                  ),
+                }
+              : confession
+          )
+        );
+      }
+    } catch (err: any) {
+      console.error("Error liking comment:", err);
+    }
+  };
+
+  const handleReplySubmit = async (commentId: string) => {
+    if (!activeConfession || !replyText.trim()) return;
+
+    try {
+      setReplySubmitting(true);
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await replyToComment(
+        activeConfession._id,
+        commentId,
+        { text: replyText.trim() },
+        token
+      );
+
+      if (response.success) {
+        const processedReplies = response.data.replies.map((reply: any) => ({
+          ...reply,
+          hasLiked: computeHasLiked(reply.likedBy, currentUserId),
+        }));
+
+        setActiveConfession((prev: any) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            comments: prev.comments.map((comment: any) =>
+              comment._id === commentId
+                ? {
+                    ...comment,
+                    replies: processedReplies,
+                  }
+                : comment
+            ),
+          };
+        });
+
+        setConfessions((prev) =>
+          prev.map((confession) =>
+            confession._id === activeConfession._id
+              ? {
+                  ...confession,
+                  comments: confession.comments.map((comment: any) =>
+                    comment._id === commentId
+                      ? {
+                          ...comment,
+                          replies: processedReplies,
+                        }
+                      : comment
+                  ),
+                }
+              : confession
+          )
+        );
+
+        setReplyText("");
+        setReplyingTo(null);
+      }
+    } catch (err: any) {
+      console.error("Error adding reply:", err);
+    } finally {
+      setReplySubmitting(false);
+    }
+  };
+
+  const toggleReplyLike = async (commentId: string, replyId: string) => {
+    if (!activeConfession) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await likeReply(
+        activeConfession._id,
+        commentId,
+        replyId,
+        token
+      );
+
+      if (response.success) {
+        // Update the active confession
+        setActiveConfession((prev: any) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            comments: prev.comments.map((comment: any) =>
+              comment._id === commentId
+                ? {
+                    ...comment,
+                    replies: comment.replies.map((reply: any) =>
+                      reply._id === replyId
+                        ? {
+                            ...reply,
+                            likesCount: response.data.likesCount,
+                            hasLiked: response.data.hasLiked,
+                          }
+                        : reply
+                    ),
+                  }
+                : comment
+            ),
+          };
+        });
+
+        // Update confessions list
+        setConfessions((prev) =>
+          prev.map((confession) =>
+            confession._id === activeConfession._id
+              ? {
+                  ...confession,
+                  comments: confession.comments.map((comment: any) =>
+                    comment._id === commentId
+                      ? {
+                          ...comment,
+                          replies: comment.replies.map((reply: any) =>
+                            reply._id === replyId
+                              ? {
+                                  ...reply,
+                                  likesCount: response.data.likesCount,
+                                  hasLiked: response.data.hasLiked,
+                                }
+                              : reply
+                          ),
+                        }
+                      : comment
+                  ),
+                }
+              : confession
+          )
+        );
+      }
+    } catch (err: any) {
+      console.error("Error liking reply:", err);
+    }
+  };
+
+  const formatTimestamp = (dateString?: string) => {
+    if (!dateString) return "Just now";
+    try {
+      return new Date(dateString).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      return dateString;
+    }
+  };
+
+  const computeHasLiked = (
+    likedBy: any[] | undefined,
+    userId: string | null
+  ) => {
+    if (!likedBy || !userId) return false;
+    return likedBy.some((id) => id.toString() === userId);
+  };
+
+  const processCommentsWithLikeState = (
+    comments: any[],
+    userId: string | null
+  ) => {
+    if (!userId) return comments;
+
+    return comments.map((comment) => ({
+      ...comment,
+      hasLiked: computeHasLiked(comment.likedBy, userId),
+      replies: comment.replies
+        ? comment.replies.map((reply: any) => ({
+            ...reply,
+            hasLiked: computeHasLiked(reply.likedBy, userId),
+          }))
+        : [],
+    }));
+  };
+
+  const toggleExpandComment = (commentId: string) => {
+    setExpandedComments((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(commentId)) {
+        newSet.delete(commentId);
+      } else {
+        newSet.add(commentId);
+      }
+      return newSet;
+    });
+  };
+
+  const renderTextWithMentions = (text: string) => {
+    // Split text by @mentions
+    const parts = text.split(/(@\w+)/g);
+
+    return (
+      <>
+        {parts.map((part, index) => {
+          if (part.startsWith("@")) {
+            return (
+              <span key={index} className="text-[#ee2b8c] font-semibold">
+                {part}
+              </span>
+            );
+          }
+          return <span key={index}>{part}</span>;
+        })}
+      </>
+    );
   };
 
   useEffect(() => {
@@ -135,10 +498,34 @@ export default function Home() {
         return;
       }
 
+      // Get current user ID from token or user storage
+      let userId: string | null = null;
+      const userStr = localStorage.getItem("user");
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          // Use 'id' from backend payload; fall back to '_id' for safety
+          userId = user.id || user._id || null;
+          setCurrentUserId(userId);
+        } catch (e) {
+          console.error("Error parsing user data:", e);
+        }
+      }
+
       const result = await getConfessions(token, 1, 20);
 
       if (result.success && result.data?.confessions) {
-        setConfessions(result.data.confessions);
+        // Process confessions to add hasLiked state for comments and replies
+        const processedConfessions = result.data.confessions.map(
+          (confession: any) => ({
+            ...confession,
+            comments: processCommentsWithLikeState(
+              confession.comments || [],
+              userId
+            ),
+          })
+        );
+        setConfessions(processedConfessions);
       } else {
         setConfessions([]);
         setConfessionsError("No confessions available at the moment!");
@@ -675,7 +1062,10 @@ export default function Home() {
                                   {confession.likesCount || 0}
                                 </span>
                               </button>
-                              <button className="flex items-center gap-1.5 hover:text-primary transition-colors">
+                              <button
+                                onClick={() => openCommentModal(confession)}
+                                className="flex items-center gap-1.5 hover:text-primary transition-colors"
+                              >
                                 <span className="material-symbols-outlined text-xl">
                                   mode_comment
                                 </span>
@@ -691,6 +1081,308 @@ export default function Home() {
                   </div>
                 )}
               </div>
+
+              {isCommentModalOpen && activeConfession && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                  <div
+                    className="absolute inset-0 bg-black/60 dark:bg-black/80"
+                    onClick={closeCommentModal}
+                  ></div>
+
+                  <div className="relative flex h-full max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl bg-[#f8f6f7] dark:bg-[#221019] shadow-2xl">
+                    <div className="flex items-center justify-between gap-2 border-b border-black/10 px-5 py-3 dark:border-white/10">
+                      <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                        Confession by {activeConfession.username}
+                      </h2>
+                      <button
+                        onClick={closeCommentModal}
+                        className="p-2 text-slate-700 dark:text-slate-300 hover:text-slate-900"
+                      >
+                        <span className="material-symbols-outlined text-2xl">
+                          close
+                        </span>
+                      </button>
+                    </div>
+
+                    <div className="flex flex-1 flex-col overflow-y-auto">
+                      <div className="border-b border-black/10 p-6 dark:border-white/10">
+                        <p className="mb-4 text-lg leading-relaxed text-slate-800 dark:text-slate-200">
+                          {activeConfession.confession}
+                        </p>
+
+                        <div className="flex items-center justify-between">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                            {formatTimestamp(activeConfession.createdAt)}
+                          </p>
+                          <div className="flex items-center gap-2 rounded-full bg-[#fde1ef] px-4 py-2 text-[#ee2b8c]">
+                            <span className="material-symbols-outlined text-[20px] font-bold text-[#ee2b8c]">
+                              favorite
+                            </span>
+                            <p className="text-sm font-bold text-[#ee2b8c]">
+                              {activeConfession.likesCount || 0}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-1 flex-col px-6 py-4">
+                        <div className="mb-4 flex items-center justify-between">
+                          <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">
+                            Comments
+                          </h3>
+                          <span className="text-sm text-slate-500 dark:text-slate-400">
+                            {activeConfession.commentsCount || 0} total
+                          </span>
+                        </div>
+
+                        <div className="flex flex-col gap-4 flex-1 overflow-y-auto">
+                          {(activeConfession.comments || []).length === 0 && (
+                            <div className="flex flex-1 items-center justify-center py-10">
+                              <p className="text-slate-500 dark:text-slate-400">
+                                Be the first to comment!
+                              </p>
+                            </div>
+                          )}
+
+                          {(activeConfession.comments || []).map(
+                            (comment: any) => (
+                              <div
+                                key={comment._id || comment.createdAt}
+                                className="flex flex-col gap-2"
+                              >
+                                {/* Main Comment */}
+                                <div className="flex flex-col items-start">
+                                  <div className="rounded-lg rounded-tl-none bg-slate-100 p-3 dark:bg-slate-800">
+                                    <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                      {comment.user?.username ||
+                                        comment.user?.name ||
+                                        "Anonymous"}
+                                    </p>
+                                    <p className="text-base text-slate-800 dark:text-slate-200 mt-1">
+                                      {renderTextWithMentions(comment.text)}
+                                    </p>
+                                  </div>
+                                  <div className="mt-1 pl-1 flex items-center gap-3 text-xs">
+                                    <span className="text-slate-500 dark:text-slate-400">
+                                      {formatTimestamp(comment.createdAt)}
+                                    </span>
+                                    <button
+                                      onClick={() =>
+                                        toggleCommentLike(comment._id)
+                                      }
+                                      className={`flex items-center gap-1 hover:text-[#ee2b8c] transition-colors ${
+                                        comment.hasLiked
+                                          ? "text-[#ee2b8c]"
+                                          : "text-slate-500 dark:text-slate-400"
+                                      }`}
+                                    >
+                                      <span className="material-symbols-outlined text-base">
+                                        {comment.hasLiked
+                                          ? "favorite"
+                                          : "favorite_border"}
+                                      </span>
+                                      <span>{comment.likesCount || 0}</span>
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        if (replyingTo === comment._id) {
+                                          setReplyingTo(null);
+                                          setReplyText("");
+                                        } else {
+                                          setReplyingTo(comment._id);
+                                          // Expand to show replies section
+                                          setExpandedComments((prev) => {
+                                            const newSet = new Set(prev);
+                                            newSet.add(comment._id);
+                                            return newSet;
+                                          });
+                                          const username =
+                                            comment.user?.username ||
+                                            comment.user?.name ||
+                                            "Anonymous";
+                                          setReplyText(`@${username} `);
+                                        }
+                                      }}
+                                      className="text-slate-500 dark:text-slate-400 hover:text-[#ee2b8c] transition-colors font-medium"
+                                    >
+                                      Reply
+                                    </button>
+                                  </div>
+                                </div>
+
+                                {/* View Replies Button */}
+                                {comment.replies &&
+                                  comment.replies.length > 0 &&
+                                  !expandedComments.has(comment._id) && (
+                                    <button
+                                      onClick={() =>
+                                        toggleExpandComment(comment._id)
+                                      }
+                                      className="ml-1 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium"
+                                    >
+                                      ── View {comment.replies.length}{" "}
+                                      {comment.replies.length === 1
+                                        ? "reply"
+                                        : "replies"}
+                                    </button>
+                                  )}
+
+                                {/* Replies */}
+                                {comment.replies &&
+                                  comment.replies.length > 0 &&
+                                  expandedComments.has(comment._id) && (
+                                    <div className="ml-8 flex flex-col gap-2">
+                                      {comment.replies.map((reply: any) => (
+                                        <div
+                                          key={reply._id}
+                                          className="flex flex-col items-start"
+                                        >
+                                          <div className="rounded-lg rounded-tl-none bg-slate-100/80 p-2.5 dark:bg-slate-800/80">
+                                            <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                              {reply.user?.username ||
+                                                reply.user?.name ||
+                                                "Anonymous"}
+                                            </p>
+                                            <p className="text-sm text-slate-800 dark:text-slate-200 mt-0.5">
+                                              {renderTextWithMentions(
+                                                reply.text
+                                              )}
+                                            </p>
+                                          </div>
+                                          <div className="mt-1 pl-1 flex items-center gap-3 text-xs">
+                                            <span className="text-slate-500 dark:text-slate-400">
+                                              {formatTimestamp(reply.createdAt)}
+                                            </span>
+                                            <button
+                                              onClick={() =>
+                                                toggleReplyLike(
+                                                  comment._id,
+                                                  reply._id
+                                                )
+                                              }
+                                              className={`flex items-center gap-1 hover:text-[#ee2b8c] transition-colors ${
+                                                reply.hasLiked
+                                                  ? "text-[#ee2b8c]"
+                                                  : "text-slate-500 dark:text-slate-400"
+                                              }`}
+                                            >
+                                              <span className="material-symbols-outlined text-sm">
+                                                {reply.hasLiked
+                                                  ? "favorite"
+                                                  : "favorite_border"}
+                                              </span>
+                                              <span>
+                                                {reply.likesCount || 0}
+                                              </span>
+                                            </button>
+                                            <button
+                                              onClick={() => {
+                                                setReplyingTo(comment._id);
+                                                // Expand to show replies section
+                                                setExpandedComments((prev) => {
+                                                  const newSet = new Set(prev);
+                                                  newSet.add(comment._id);
+                                                  return newSet;
+                                                });
+                                                const username =
+                                                  reply.user?.username ||
+                                                  reply.user?.name ||
+                                                  "Anonymous";
+                                                setReplyText(`@${username} `);
+                                              }}
+                                              className="text-slate-500 dark:text-slate-400 hover:text-[#ee2b8c] transition-colors font-medium"
+                                            >
+                                              Reply
+                                            </button>
+                                          </div>
+                                        </div>
+                                      ))}
+
+                                      {/* Hide Replies Button */}
+                                      <button
+                                        onClick={() =>
+                                          toggleExpandComment(comment._id)
+                                        }
+                                        className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium self-start"
+                                      >
+                                        ── Hide replies
+                                      </button>
+                                    </div>
+                                  )}
+
+                                {/* Reply Input */}
+                                {replyingTo === comment._id && (
+                                  <div className="ml-8 flex items-center gap-2">
+                                    <input
+                                      type="text"
+                                      value={replyText}
+                                      onChange={(e) =>
+                                        setReplyText(e.target.value)
+                                      }
+                                      placeholder="Write a reply..."
+                                      autoFocus
+                                      className="flex-1 rounded-full border border-slate-300 bg-slate-100 py-2 px-4 text-sm text-slate-900 placeholder-slate-500 focus:outline-none focus:border-slate-300 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
+                                      onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                          handleReplySubmit(comment._id);
+                                        }
+                                      }}
+                                    />
+                                    <button
+                                      onClick={() =>
+                                        handleReplySubmit(comment._id)
+                                      }
+                                      disabled={
+                                        replySubmitting || !replyText.trim()
+                                      }
+                                      className="flex h-8 w-8 items-center justify-center rounded-full bg-[#ee2b8c] text-white transition-colors hover:bg-[#d71e78] disabled:opacity-60 disabled:cursor-not-allowed"
+                                    >
+                                      <span className="material-symbols-outlined text-sm">
+                                        {replySubmitting
+                                          ? "hourglass_empty"
+                                          : "send"}
+                                      </span>
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-auto border-t border-black/10 p-4 dark:border-white/10">
+                      {commentError && (
+                        <p className="mb-2 text-sm text-red-500">
+                          {commentError}
+                        </p>
+                      )}
+                      <form
+                        onSubmit={handleCommentSubmit}
+                        className="relative flex items-center"
+                      >
+                        <input
+                          type="text"
+                          value={newComment}
+                          onChange={(e) => setNewComment(e.target.value)}
+                          placeholder="Add a comment..."
+                          className="w-full rounded-full border border-slate-300 bg-slate-100 py-3 pl-4 pr-14 text-slate-900 placeholder-slate-500 focus:outline-none focus:border-slate-300 focus:ring-0 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:placeholder-slate-400"
+                        />
+                        <button
+                          type="submit"
+                          disabled={commentSubmitting}
+                          className="absolute right-2 flex h-10 w-10 items-center justify-center rounded-full bg-[#ee2b8c] text-white transition-colors hover:bg-[#d71e78] disabled:opacity-60 disabled:cursor-not-allowed"
+                        >
+                          <span className="material-symbols-outlined">
+                            {commentSubmitting ? "hourglass_empty" : "send"}
+                          </span>
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Info Section */}
               {!loading && matches.length > 0 && (

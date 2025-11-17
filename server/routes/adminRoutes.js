@@ -11,6 +11,10 @@ import {
   getAllChatsAdmin,
   deleteChatAdmin,
 } from "../controllers/adminController.js";
+import {
+  getAllConfessionsAdmin,
+  deleteConfessionAdmin,
+} from "../controllers/confessionController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
@@ -35,5 +39,13 @@ router.delete("/users/:userId", adminMiddleware, deleteUserAdmin);
 // Chat Rooms CRUD
 router.get("/chats", adminMiddleware, getAllChatsAdmin);
 router.delete("/chats/:chatId", adminMiddleware, deleteChatAdmin);
+
+// Confessions CRUD
+router.get("/confessions", adminMiddleware, getAllConfessionsAdmin);
+router.delete(
+  "/confessions/:confessionId",
+  adminMiddleware,
+  deleteConfessionAdmin
+);
 
 export default router;

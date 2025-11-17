@@ -278,4 +278,74 @@ export const deleteChat = async (
   }
 };
 
+//get all confessions (for admin)
+export const getAllConfessions = async (
+  token: string
+): Promise<{
+  success: boolean;
+  count: number;
+  data: {
+    confessions: Array<{
+      _id: string;
+      confession: string;
+      username: string;
+      community: string;
+      domain: string;
+      likesCount: number;
+      commentsCount: number;
+      createdAt: string;
+    }>;
+  };
+}> => {
+  try {
+    const response = await api.get("/api/admin/confessions", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to fetch confessions"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+//delete confession (for admin)
+export const deleteConfession = async (
+  confessionId: string,
+  token: string
+): Promise<{
+  success: boolean;
+  message: string;
+}> => {
+  try {
+    const response = await api.delete(
+      `/api/admin/confessions/${confessionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to delete confession"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
 export default api;

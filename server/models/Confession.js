@@ -41,6 +41,45 @@ const confessionSchema = new mongoose.Schema(
           trim: true,
           maxlength: [500, "Comment cannot exceed 500 characters"],
         },
+        likesCount: {
+          type: Number,
+          default: 0,
+        },
+        likedBy: [
+          {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+          },
+        ],
+        replies: [
+          {
+            user: {
+              type: mongoose.Schema.Types.ObjectId,
+              ref: "User",
+              required: true,
+            },
+            text: {
+              type: String,
+              required: true,
+              trim: true,
+              maxlength: [500, "Reply cannot exceed 500 characters"],
+            },
+            likesCount: {
+              type: Number,
+              default: 0,
+            },
+            likedBy: [
+              {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+              },
+            ],
+            createdAt: {
+              type: Date,
+              default: Date.now,
+            },
+          },
+        ],
         createdAt: {
           type: Date,
           default: Date.now,
