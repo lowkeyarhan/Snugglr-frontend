@@ -2,6 +2,7 @@ import Chat from "../models/Chat.js";
 import Message from "../models/Message.js";
 import User from "../models/User.js";
 import { createAndEmitNotification } from "../utils/notificationHelper.js";
+import webSocketHub from "../websocket/websocketHub.js";
 
 export const getChats = async (req, res) => {
   try {
@@ -120,28 +121,29 @@ export const sendMessage = async (req, res) => {
 
     if (recipient) {
       try {
-        const io = req.app.get("io");
-        await createAndEmitNotification(
-          {
-            recipient: recipient,
-            sender: currentUserId,
-            type: "new_message",
-            title: "New Message",
-            message: chat.revealed
-              ? `${message.sender.name} sent you a message`
-              : `${message.sender.username} sent you a message`,
-            relatedChat: chatId,
-            relatedMessage: message._id,
-            actionUrl: `/chat/${chatId}`,
-          },
-          io
-        );
+        await createAndEmitNotification({
+          recipient: recipient,
+          sender: currentUserId,
+          type: "new_message",
+          title: "New Message",
+          message: chat.revealed
+            ? `${message.sender.name} sent you a message`
+            : `${message.sender.username} sent you a message`,
+          relatedChat: chatId,
+          relatedMessage: message._id,
+          actionUrl: `/chat/${chatId}`,
+        });
       } catch (notifError) {
         console.error(
           `Error creating message notification: ${notifError.message}`
         );
       }
     }
+
+    webSocketHub.pushChatMessage(chatId.toString(), {
+      message,
+      chatId,
+    });
 
     res.status(201).json({
       success: true,
@@ -234,32 +236,25 @@ export const submitGuess = async (req, res) => {
         await chat.save();
 
         try {
-          const io = req.app.get("io");
-          await createAndEmitNotification(
-            {
-              recipient: currentUserId,
-              sender: otherUser._id,
-              type: "identity_revealed",
-              title: "Identities Revealed! 🎉",
-              message: `You and ${otherUserFull.name} guessed correctly!`,
-              relatedChat: chatId,
-              actionUrl: `/chat/${chatId}`,
-            },
-            io
-          );
+          await createAndEmitNotification({
+            recipient: currentUserId,
+            sender: otherUser._id,
+            type: "identity_revealed",
+            title: "Identities Revealed! 🎉",
+            message: `You and ${otherUserFull.name} guessed correctly!`,
+            relatedChat: chatId,
+            actionUrl: `/chat/${chatId}`,
+          });
 
-          await createAndEmitNotification(
-            {
-              recipient: otherUser._id,
-              sender: currentUserId,
-              type: "identity_revealed",
-              title: "Identities Revealed! 🎉",
-              message: `You and ${user.name} guessed correctly!`,
-              relatedChat: chatId,
-              actionUrl: `/chat/${chatId}`,
-            },
-            io
-          );
+          await createAndEmitNotification({
+            recipient: otherUser._id,
+            sender: currentUserId,
+            type: "identity_revealed",
+            title: "Identities Revealed! 🎉",
+            message: `You and ${user.name} guessed correctly!`,
+            relatedChat: chatId,
+            actionUrl: `/chat/${chatId}`,
+          });
         } catch (notifError) {
           console.error(
             `Error creating reveal notifications: ${notifError.message}`

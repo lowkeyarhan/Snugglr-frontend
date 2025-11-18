@@ -199,19 +199,15 @@ export const likeConfession = async (req, res) => {
           confessionAuthor &&
           confessionAuthor._id.toString() !== req.user._id.toString()
         ) {
-          const io = req.app.get("io");
-          await createAndEmitNotification(
-            {
-              recipient: confessionAuthor._id,
-              sender: req.user._id,
-              type: "confession_like",
-              title: "New Like on Confession",
-              message: `Someone liked your confession`,
-              relatedConfession: confession._id,
-              actionUrl: `/confessions/${confession._id}`,
-            },
-            io
-          );
+          await createAndEmitNotification({
+            recipient: confessionAuthor._id,
+            sender: req.user._id,
+            type: "confession_like",
+            title: "New Like on Confession",
+            message: `Someone liked your confession`,
+            relatedConfession: confession._id,
+            actionUrl: `/confessions/${confession._id}`,
+          });
         }
       } catch (notifError) {
         console.error(
@@ -303,19 +299,15 @@ export const commentOnConfession = async (req, res) => {
         confessionAuthor &&
         confessionAuthor._id.toString() !== userId.toString()
       ) {
-        const io = req.app.get("io");
-        await createAndEmitNotification(
-          {
-            recipient: confessionAuthor._id,
-            sender: userId,
-            type: "confession_comment",
-            title: "New Comment on Confession",
-            message: `${req.user.username} commented on your confession`,
-            relatedConfession: confession._id,
-            actionUrl: `/confessions/${confession._id}`,
-          },
-          io
-        );
+        await createAndEmitNotification({
+          recipient: confessionAuthor._id,
+          sender: userId,
+          type: "confession_comment",
+          title: "New Comment on Confession",
+          message: `${req.user.username} commented on your confession`,
+          relatedConfession: confession._id,
+          actionUrl: `/confessions/${confession._id}`,
+        });
       }
     } catch (notifError) {
       console.error(

@@ -1,20 +1,17 @@
 import { createNotification } from "../controllers/notificationController.js";
-import { emitNotification } from "../sockets/notificationSocket.js";
+import webSocketHub from "../websocket/websocketHub.js";
 
 /**
- * Create a notification and emit it via socket
- * This is a helper function to be used by controllers
- * @param {Object} notificationData - The notification data
- * @param {Object} io - The socket.io instance (optional)
+ * Creates a notification and pushes it over the websocket hub.
  */
-export const createAndEmitNotification = async (
-  notificationData,
-  io = null
-) => {
+export const createAndEmitNotification = async (notificationData) => {
   try {
     const notification = await createNotification(notificationData);
-    if (io && notification && notification.recipient) {
-      emitNotification(io, notification.recipient.toString(), notification);
+    if (notification?.recipient) {
+      webSocketHub.pushNotification(
+        notification.recipient.toString(),
+        notification
+      );
     }
 
     return notification;

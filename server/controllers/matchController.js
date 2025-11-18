@@ -118,34 +118,27 @@ export const swipe = async (req, res) => {
 
       // Create match notifications for both users
       try {
-        const io = req.app.get("io");
-        await createAndEmitNotification(
-          {
-            recipient: currentUserId,
-            sender: targetUserId,
-            type: "new_match",
-            title: "It's a Match! 🎉",
-            message: "You have a new match! Start chatting now.",
-            relatedMatch: existingMatch._id,
-            relatedChat: chat._id,
-            actionUrl: `/chat/${chat._id}`,
-          },
-          io
-        );
+        await createAndEmitNotification({
+          recipient: currentUserId,
+          sender: targetUserId,
+          type: "new_match",
+          title: "It's a Match! 🎉",
+          message: "You have a new match! Start chatting now.",
+          relatedMatch: existingMatch._id,
+          relatedChat: chat._id,
+          actionUrl: `/chat/${chat._id}`,
+        });
 
-        await createAndEmitNotification(
-          {
-            recipient: targetUserId,
-            sender: currentUserId,
-            type: "new_match",
-            title: "It's a Match! 🎉",
-            message: "You have a new match! Start chatting now.",
-            relatedMatch: existingMatch._id,
-            relatedChat: chat._id,
-            actionUrl: `/chat/${chat._id}`,
-          },
-          io
-        );
+        await createAndEmitNotification({
+          recipient: targetUserId,
+          sender: currentUserId,
+          type: "new_match",
+          title: "It's a Match! 🎉",
+          message: "You have a new match! Start chatting now.",
+          relatedMatch: existingMatch._id,
+          relatedChat: chat._id,
+          actionUrl: `/chat/${chat._id}`,
+        });
       } catch (notifError) {
         console.error(
           `❌ Error creating match notifications: ${notifError.message}`

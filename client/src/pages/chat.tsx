@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import {
   getChatRooms,
@@ -9,6 +9,34 @@ import {
   getCurrentUser,
 } from "../API/api";
 import { getAuthToken } from "../API/auth";
+
+const resolveWsEndpoint = () => {
+  const base =
+    import.meta.env.VITE_WS_URL ||
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:8081";
+  const trimmed = base.endsWith("/") ? base.slice(0, -1) : base;
+
+  if (trimmed.startsWith("ws://") || trimmed.startsWith("wss://")) {
+    return trimmed.endsWith("/ws") ? trimmed : `${trimmed}/ws`;
+  }
+
+  if (trimmed.startsWith("https://")) {
+    const host = trimmed.slice("https://".length);
+    const url = `wss://${host}`;
+    return url.endsWith("/ws") ? url : `${url}/ws`;
+  }
+
+  if (trimmed.startsWith("http://")) {
+    const host = trimmed.slice("http://".length);
+    const url = `ws://${host}`;
+    return url.endsWith("/ws") ? url : `${url}/ws`;
+  }
+
+  return trimmed.endsWith("/ws") ? trimmed : `ws://${trimmed}/ws`;
+};
+
+const WS_ENDPOINT = resolveWsEndpoint();
 
 // Types
 interface Chat {
@@ -64,6 +92,9 @@ export default function Chat() {
   const [currentUserGuess, setCurrentUserGuess] = useState<string>("");
   const [otherUserGuess, setOtherUserGuess] = useState<string>("");
   const [showRevealSuccess, setShowRevealSuccess] = useState<boolean>(false);
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeChatRef = useRef<string>("");
 
   const userProfileImage =
     "https://lh3.googleusercontent.com/aida-public/AB6AXuB3_iPJIQrt9-mW5A2ydCh3Yxc4LvljOrKyoltkptN-cVP6DbgD5zAnr4dEs77kaw5Z8IqCaskYDyn_nJ-7e1EQD6Mb6OXgIyrvFZGK4vcEV_4flgPXBJhCJYP4RWJgmdloYhBZdEczYdkPD91Lbxip2szT9kOihSNg5cv4LAw4gFIEslHasQHpUQwZvWBs8cSEUqlKhDBI0KtNhHEcGz1lzukeOzUbX5Zg0W62uoUsmn7g8g5pIk7t8OIfrlI8EmzJYYxJH5A9BR92";
@@ -101,6 +132,100 @@ export default function Chat() {
     loadData();
   }, []);
 
+  useEffect(() => {
+    const token = getAuthToken();
+    if (!token) return;
+
+    let shouldReconnect = true;
+
+    const connect = () => {
+      const socket = new WebSocket(
+        `${WS_ENDPOINT}?token=${encodeURIComponent(token)}`
+      );
+      wsRef.current = socket;
+
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ type: "joinNotifications" }));
+        if (activeChatRef.current) {
+          socket.send(
+            JSON.stringify({
+              type: "joinChat",
+              chatId: activeChatRef.current,
+            })
+          );
+        }
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data) as {
+            type: string;
+            data?: { message: Message; chatId: string };
+          };
+          if (payload.type === "chat:message") {
+            const { message, chatId } = payload.data || {};
+            if (!message || !chatId) return;
+
+            setChats((prevChats) => {
+              let found = false;
+              const updated = prevChats.map((chat) => {
+                if (chat._id !== chatId) {
+                  return chat;
+                }
+                found = true;
+                return {
+                  ...chat,
+                  updatedAt: message.createdAt,
+                  lastMessage: {
+                    text: message.text,
+                    sender:
+                      typeof message.sender === "string"
+                        ? message.sender
+                        : message.sender?._id || "",
+                    createdAt: message.createdAt,
+                  },
+                };
+              });
+              return found ? updated : prevChats;
+            });
+
+            if (activeChatRef.current === chatId) {
+              setMessages((prevMessages) => {
+                if (prevMessages.some((msg) => msg._id === message._id)) {
+                  return prevMessages;
+                }
+                return [...prevMessages, message];
+              });
+            }
+          }
+        } catch (error) {
+          console.error("WebSocket message error:", error);
+        }
+      };
+
+      socket.onerror = () => {
+        socket.close();
+      };
+
+      socket.onclose = () => {
+        if (!shouldReconnect) return;
+        reconnectTimerRef.current = setTimeout(connect, 1500);
+      };
+    };
+
+    connect();
+
+    return () => {
+      shouldReconnect = false;
+      if (reconnectTimerRef.current) {
+        clearTimeout(reconnectTimerRef.current);
+      }
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
+
   // Load messages when active chat changes
   useEffect(() => {
     const loadMessages = async () => {
@@ -119,6 +244,29 @@ export default function Chat() {
     };
 
     loadMessages();
+  }, [activeChatId]);
+
+  useEffect(() => {
+    const socket = wsRef.current;
+    const previousChat = activeChatRef.current;
+
+    if (socket && socket.readyState === WebSocket.OPEN) {
+      if (previousChat && previousChat !== activeChatId) {
+        socket.send(
+          JSON.stringify({ type: "leaveChat", chatId: previousChat })
+        );
+      }
+      if (activeChatId && activeChatId !== previousChat) {
+        socket.send(JSON.stringify({ type: "joinChat", chatId: activeChatId }));
+      }
+      if (!activeChatId && previousChat) {
+        socket.send(
+          JSON.stringify({ type: "leaveChat", chatId: previousChat })
+        );
+      }
+    }
+
+    activeChatRef.current = activeChatId || "";
   }, [activeChatId]);
 
   // Load reveal status when active chat changes
@@ -240,14 +388,7 @@ export default function Chat() {
       const token = getAuthToken();
       if (!token) return;
 
-      const response = await sendMessage(
-        activeChatId,
-        messageInput.trim(),
-        token
-      );
-
-      // Add the new message to the messages list
-      setMessages((prev) => [...prev, response.data.message]);
+      await sendMessage(activeChatId, messageInput.trim(), token);
       setMessageInput("");
 
       // Update the chat list to show the new last message
@@ -541,7 +682,7 @@ export default function Chat() {
           )}
 
           {/* Messages Area */}
-          <div className="flex-grow overflow-y-auto p-6 space-y-2 bg-slate-50 dark:bg-slate-950">
+          <div className="flex-grow overflow-y-auto p-6 bg-slate-50 dark:bg-slate-950">
             {messages.length > 0 ? (
               messages.map((message, index) => {
                 const prev = messages[index - 1];
@@ -567,27 +708,29 @@ export default function Chat() {
                   isLastInGroup
                 );
 
-                if (isFromCurrentUser) {
-                  return (
-                    <div key={message._id} className="flex justify-end">
-                      <div
-                        className={`max-w-[70%] px-4 py-2.5 ${bubbleRadius} bg-primary text-white text-[15px] leading-relaxed`}
-                      >
-                        {message.text}
-                      </div>
+                const spacingClass =
+                  index === 0 ? "mt-0" : isFirstInGroup ? "mt-5" : "mt-1.5";
+
+                const wrapperAlignment = isFromCurrentUser
+                  ? "justify-end"
+                  : "justify-start";
+
+                return (
+                  <div
+                    key={message._id}
+                    className={`flex ${wrapperAlignment} ${spacingClass}`}
+                  >
+                    <div
+                      className={`max-w-[70%] px-4 py-2.5 ${bubbleRadius} ${
+                        isFromCurrentUser
+                          ? "bg-primary text-white"
+                          : "bg-slate-200 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100"
+                      } text-[15px] leading-relaxed`}
+                    >
+                      {message.text}
                     </div>
-                  );
-                } else {
-                  return (
-                    <div key={message._id} className="flex justify-start">
-                      <div
-                        className={`max-w-[70%] px-4 py-2.5 ${bubbleRadius} bg-slate-200 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 text-[15px] leading-relaxed`}
-                      >
-                        {message.text}
-                      </div>
-                    </div>
-                  );
-                }
+                  </div>
+                );
               })
             ) : (
               <div className="flex flex-col w-full text-center items-center justify-center h-full py-20">
