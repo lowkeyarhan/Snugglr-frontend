@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateUserProfile } from "../API/api";
+import { updateUserProfile } from "../userAPI/user";
 
 export default function Onboarding() {
   const [formData, setFormData] = useState({
@@ -59,8 +59,8 @@ export default function Onboarding() {
       }
       const result = await updateUserProfile(submitData, token);
 
-      if (result.data?.user) {
-        localStorage.setItem("user", JSON.stringify(result.data.user));
+      if (result.data) {
+        localStorage.setItem("user", JSON.stringify(result.data));
       }
 
       setSuccess(true);

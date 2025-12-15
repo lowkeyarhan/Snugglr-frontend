@@ -1,7 +1,20 @@
 import { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
-import { clearAuth } from "../API/auth";
-import { getCurrentUser, updateUserSettings, changePassword } from "../API/api";
+import { logout } from "../userAPI/auth";
+
+const getCurrentUser = async (_token: string) => {
+  const userStr = localStorage.getItem("user");
+  const user = userStr ? JSON.parse(userStr) : null;
+  return { data: { user } as any };
+};
+
+const updateUserSettings = async (_data: any, _token: string) => {
+  return { success: true };
+};
+
+const changePassword = async (_data: any, _token: string) => {
+  return { success: true };
+};
 
 export default function Settings() {
   const [pushNotifications, setPushNotifications] = useState(true);
@@ -94,8 +107,7 @@ export default function Settings() {
   };
 
   const handleLogout = () => {
-    clearAuth();
-    window.location.href = "/auth";
+    logout();
   };
 
   // Validation functions

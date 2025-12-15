@@ -1,20 +1,28 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
+import { getAuthToken } from "../userAPI/auth";
 import {
-  getChatRooms,
-  getMessages,
-  sendMessage,
-  submitGuess,
-  getRevealStatus,
-  getCurrentUser,
-} from "../API/api";
-import { getAuthToken } from "../API/auth";
+  getMessages as getMessagesApi,
+  sendMessage as sendMessageApi,
+} from "../userAPI/messages";
+import { getMyChats as getMyChatsApi } from "../userAPI/rooms";
+import { getMyProfile as getMyProfileApi } from "../userAPI/user";
+
+// Compat wrappers: these APIs used to exist in a legacy `userAPI/api` layer.
+// The backend currently doesn't expose reveal/guess endpoints, so keep UI stable.
+const submitGuess = async (_chatId: string, _guess: string, _token: string) => {
+  return { data: { revealed: false, chat: null } as any };
+};
+
+const getRevealStatus = async (_chatId: string, _token: string) => {
+  return { data: { revealed: false, users: null } as any };
+};
 
 const resolveWsEndpoint = () => {
   const base =
     import.meta.env.VITE_WS_URL ||
     import.meta.env.VITE_API_URL ||
-    "http://localhost:8081";
+    "http://localhost:8080";
   const trimmed = base.endsWith("/") ? base.slice(0, -1) : base;
 
   if (trimmed.startsWith("ws://") || trimmed.startsWith("wss://")) {
@@ -55,7 +63,7 @@ interface Chat {
   revealed: boolean;
   updatedAt: string;
   lastMessage?: {
-    text: string;
+    text: string | null;
     sender: string;
     createdAt: string;
   };
@@ -63,16 +71,24 @@ interface Chat {
 
 interface Message {
   _id: string;
-  chatId: string;
-  sender: {
-    _id: string;
-    name: string;
-    username: string;
-    image?: string;
-  };
-  text: string;
+  chatId?: string;
+  sender:
+    | null
+    | string
+    | {
+        _id: string;
+        name?: string;
+        username?: string;
+        image?: string;
+      };
+  text: string | null;
   createdAt: string;
 }
+
+const getSenderId = (sender: Message["sender"]): string | undefined => {
+  if (!sender) return undefined;
+  return typeof sender === "string" ? sender : sender._id;
+};
 
 export default function Chat() {
   const [chats, setChats] = useState<Chat[]>([]);
@@ -111,16 +127,26 @@ export default function Chat() {
         }
 
         // Load current user
-        const userResponse = await getCurrentUser(token);
-        setCurrentUser(userResponse.data?.user);
+        const userResponse = await getMyProfileApi(token);
+        const user: any = userResponse.data;
+        // Normalize to legacy shape this page expects
+        setCurrentUser({
+          ...user,
+          id: user?._id ?? user?.id,
+          guesses: user?.guesses ?? [],
+        });
 
         // Load chats
-        const chatsResponse = await getChatRooms(token);
-        setChats(chatsResponse.data.chats);
+        const chats = await getMyChatsApi(token);
+        const normalizedChats: any = (chats || []).map((c: any) => ({
+          ...c,
+          revealed: c?.revealed ?? false,
+        }));
+        setChats(normalizedChats);
 
         // Set first chat as active if available
-        if (chatsResponse.data.chats.length > 0) {
-          setActiveChatId(chatsResponse.data.chats[0]._id);
+        if (normalizedChats.length > 0) {
+          setActiveChatId(normalizedChats[0]._id);
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -235,9 +261,9 @@ export default function Chat() {
         const token = getAuthToken();
         if (!token) return;
 
-        const response = await getMessages(activeChatId, token);
+        const response = await getMessagesApi(activeChatId, token);
         setMessages(response.data.messages);
-        setRevealStatus({ revealed: response.data.revealed, users: null });
+        setRevealStatus({ revealed: false, users: null });
       } catch (error) {
         console.error("Error loading messages:", error);
       }
@@ -388,7 +414,7 @@ export default function Chat() {
       const token = getAuthToken();
       if (!token) return;
 
-      await sendMessage(activeChatId, messageInput.trim(), token);
+      await sendMessageApi(activeChatId, messageInput.trim(), token);
       setMessageInput("");
 
       // Update the chat list to show the new last message
@@ -445,12 +471,22 @@ export default function Chat() {
       }
 
       // Refresh current user data to get updated guesses
-      const userResponse = await getCurrentUser(token);
-      setCurrentUser(userResponse.data?.user);
+      const userResponse = await getMyProfileApi(token);
+      const user: any = userResponse.data;
+      setCurrentUser({
+        ...user,
+        id: user?._id ?? user?.id,
+        guesses: user?.guesses ?? [],
+      });
 
       // Refresh chats to get updated revealed status
-      const chatsResponse = await getChatRooms(token);
-      setChats(chatsResponse.data.chats);
+      const chats = await getMyChatsApi(token);
+      setChats(
+        (chats || []).map((c: any) => ({
+          ...c,
+          revealed: c?.revealed ?? false,
+        }))
+      );
 
       setGuessInput("");
     } catch (error) {
@@ -687,18 +723,20 @@ export default function Chat() {
               messages.map((message, index) => {
                 const prev = messages[index - 1];
                 const next = messages[index + 1];
+                const senderId = getSenderId(message.sender);
+                const prevSenderId = prev
+                  ? getSenderId(prev.sender)
+                  : undefined;
+                const nextSenderId = next
+                  ? getSenderId(next.sender)
+                  : undefined;
                 const isFromCurrentUser =
-                  message.sender._id?.toString() ===
-                  currentUser?.id?.toString();
+                  (senderId || "").toString() === currentUser?.id?.toString();
 
                 const isPrevSame =
-                  prev &&
-                  prev.sender._id?.toString() ===
-                    message.sender._id?.toString();
+                  !!prev && prevSenderId?.toString() === senderId?.toString();
                 const isNextSame =
-                  next &&
-                  next.sender._id?.toString() ===
-                    message.sender._id?.toString();
+                  !!next && nextSenderId?.toString() === senderId?.toString();
                 const isFirstInGroup = !isPrevSame;
                 const isLastInGroup = !isNextSame;
 
@@ -727,7 +765,7 @@ export default function Chat() {
                           : "bg-slate-200 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100"
                       } text-[15px] leading-relaxed`}
                     >
-                      {message.text}
+                      {message.text ?? ""}
                     </div>
                   </div>
                 );

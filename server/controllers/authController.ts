@@ -7,7 +7,7 @@ import { generateUniqueAnonymousUsername } from "../utils/usernameGenerator";
 // register a new user
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, gender, birthday, pronouns } = req.body;
+    const { email, password, name } = req.body;
 
     // check if email and password are provided
     if (!email || !password) {
@@ -40,9 +40,6 @@ export const registerUser = async (req, res) => {
       });
     }
 
-    // If the college is allowed, extract the institution name and add it as collegeName
-    const collegeName = allowedCollege.institutionName;
-
     // hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -50,16 +47,21 @@ export const registerUser = async (req, res) => {
     // generate a unique anonymous username
     const username = await generateUniqueAnonymousUsername(UserModel);
 
-    // create new user
+    // `name` is required by the User schema, but the client may only provide email+password at signup.
+    // Use a safe placeholder; onboarding/profile update will overwrite later.
+    const safeName =
+      typeof name === "string" && name.trim().length > 0
+        ? name.trim()
+        : "Anonymous";
+
+    // create new user with only email and password
+    // other details will be filled during onboarding
     const newUser = await UserModel.create({
-      name,
+      name: safeName,
       username,
       email: normalizedEmail,
       password: hashedPassword,
       role: "user",
-      gender,
-      birthday,
-      pronouns,
       collegeName: allowedCollege.institutionName,
       institution: allowedCollege._id,
     });
@@ -75,16 +77,17 @@ export const registerUser = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User created successfully",
-      user: {
-        _id: newUser._id,
-        name: newUser.name,
-        username: newUser.username,
-        email: normalizedEmail,
-        collegeName: allowedCollege.institutionName,
-        institution: allowedCollege._id,
-        role: "user",
+      data: {
+        user: {
+          _id: newUser._id,
+          username: newUser.username,
+          email: normalizedEmail,
+          collegeName: allowedCollege.institutionName,
+          institution: allowedCollege._id,
+          role: "user",
+        },
+        token,
       },
-      token,
     });
   } catch (error) {
     console.error(error);

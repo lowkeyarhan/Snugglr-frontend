@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import Sidebar from "../components/Sidebar";
-import { getCurrentUser, updateUserProfile } from "../API/api";
-import { clearAuth } from "../API/auth";
+import { getMyProfile, updateUserProfile } from "../userAPI/user";
+import { logout } from "../userAPI/auth";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
@@ -47,10 +47,10 @@ export default function Profile() {
         return;
       }
 
-      const result = await getCurrentUser(token);
+      const result = await getMyProfile(token);
 
-      if (result.data?.user) {
-        const user = result.data.user;
+      if (result.data) {
+        const user: any = result.data;
         setFormData({
           name: user.name || "",
           username: user.username || "",
@@ -140,8 +140,8 @@ export default function Profile() {
 
       const result = await updateUserProfile(submitData, token);
 
-      if (result.data?.user) {
-        localStorage.setItem("user", JSON.stringify(result.data.user));
+      if (result.data) {
+        localStorage.setItem("user", JSON.stringify(result.data));
       }
 
       setIsSaving(false);

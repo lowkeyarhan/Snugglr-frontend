@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
-import { createConfession } from "../API/api";
+import { createConfession } from "../userAPI/confessions";
 
 export default function Create() {
   const navigate = useNavigate();
@@ -24,12 +24,7 @@ export default function Create() {
       }
 
       // Call the API to create confession
-      const response = await createConfession(
-        {
-          text: confessionText.trim(),
-        },
-        token
-      );
+      const response = await createConfession(confessionText.trim(), token);
 
       if (response.success) {
         // Set posted state to show "Posted" button

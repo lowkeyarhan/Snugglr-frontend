@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import type { ReactElement } from "react";
-import { isAuthenticated, getAuthToken } from "../API/auth";
-import { checkAdminStatus } from "../API/api";
+import { isAuthenticated, getAuthToken } from "../userAPI/auth";
+import { getUser } from "../userAPI/auth";
 
 interface AdminRouteProps {
   children: ReactElement;
@@ -43,10 +43,12 @@ export default function AdminRoute({ children }: AdminRouteProps) {
             return;
           }
 
-          // Fetch fresh data
-          const response = await checkAdminStatus(token);
-          setIsAdmin(response.isAdmin);
-          localStorage.setItem("isAdmin", response.isAdmin.toString());
+          // Determine admin locally from stored user role
+          const u = getUser();
+          const role = u?.role;
+          const nextIsAdmin = role === "admin" || role === "superadmin";
+          setIsAdmin(nextIsAdmin);
+          localStorage.setItem("isAdmin", nextIsAdmin.toString());
           localStorage.setItem("adminCheckTimestamp", now.toString());
         } else {
           setIsAdmin(false);

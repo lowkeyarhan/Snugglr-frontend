@@ -2,15 +2,24 @@ import { useState, useEffect, useRef } from "react";
 import type { FormEvent } from "react";
 import Sidebar from "../components/Sidebar";
 import {
-  getPotentialMatches,
-  swipeUser,
   getConfessions,
   likeConfession,
   commentOnConfession,
   likeComment,
   replyToComment,
-  likeReply,
-} from "../API/api";
+} from "../userAPI/confessions";
+
+const getPotentialMatches = async (_token: string) => {
+  return { data: { users: [] as any[] } };
+};
+
+const swipeUser = async (
+  _userId: string,
+  _action: "like" | "pass",
+  _token: string
+) => {
+  return { success: true };
+};
 
 // Dummy Stories (no functionality)
 const dummyStories = [
@@ -82,17 +91,19 @@ export default function Home() {
       const response = await likeConfession(confessionId, token);
 
       if (response.success) {
-        // Update the confession with new like count and like state
         setConfessions((prev) =>
-          prev.map((confession) =>
-            confession._id === confessionId
-              ? {
-                  ...confession,
-                  likesCount: response.data.likesCount,
-                  hasLiked: response.data.hasLiked,
-                }
-              : confession
-          )
+          prev.map((confession) => {
+            if (confession._id !== confessionId) return confession;
+            const prevCount = Number(confession.likesCount || 0);
+            const nextCount = response.liked
+              ? prevCount + 1
+              : Math.max(0, prevCount - 1);
+            return {
+              ...confession,
+              likesCount: nextCount,
+              hasLiked: response.liked,
+            };
+          })
         );
       }
     } catch (err: any) {
@@ -138,19 +149,22 @@ export default function Home() {
 
       const response = await commentOnConfession(
         activeConfession._id,
-        { text: trimmedComment },
+        trimmedComment,
         token
       );
 
       if (response.success) {
-        const updatedComments = response.data.comments || [];
-        const updatedCount =
-          response.data.commentsCount ?? updatedComments.length;
-
+        const newCommentObj = {
+          ...response.data,
+          hasLiked: false,
+          likesCount: response.data?.likesCount ?? 0,
+          replies: [],
+        };
         const processedComments = processCommentsWithLikeState(
-          updatedComments,
+          [...(activeConfession.comments || []), newCommentObj],
           currentUserId
         );
+        const updatedCount = processedComments.length;
 
         setConfessions((prev) =>
           prev.map((confession) =>
@@ -191,11 +205,7 @@ export default function Home() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await likeComment(
-        activeConfession._id,
-        commentId,
-        token
-      );
+      const response = await likeComment(commentId, token);
 
       if (response.success) {
         // Update the active confession
@@ -207,8 +217,10 @@ export default function Home() {
               comment._id === commentId
                 ? {
                     ...comment,
-                    likesCount: response.data.likesCount,
-                    hasLiked: response.data.hasLiked,
+                    likesCount: response.liked
+                      ? Number(comment.likesCount || 0) + 1
+                      : Math.max(0, Number(comment.likesCount || 0) - 1),
+                    hasLiked: response.liked,
                   }
                 : comment
             ),
@@ -225,8 +237,10 @@ export default function Home() {
                     comment._id === commentId
                       ? {
                           ...comment,
-                          likesCount: response.data.likesCount,
-                          hasLiked: response.data.hasLiked,
+                          likesCount: response.liked
+                            ? Number(comment.likesCount || 0) + 1
+                            : Math.max(0, Number(comment.likesCount || 0) - 1),
+                          hasLiked: response.liked,
                         }
                       : comment
                   ),
@@ -251,12 +265,17 @@ export default function Home() {
       const response = await replyToComment(
         activeConfession._id,
         commentId,
-        { text: replyText.trim() },
+        replyText.trim(),
         token
       );
 
       if (response.success) {
-        const processedReplies = response.data.replies.map((reply: any) => ({
+        const newReply = {
+          ...response.data,
+          hasLiked: false,
+          likesCount: response.data?.likesCount ?? 0,
+        };
+        const processedReplies = [newReply].map((reply: any) => ({
           ...reply,
           hasLiked: computeHasLiked(reply.likedBy, currentUserId),
         }));
@@ -269,7 +288,7 @@ export default function Home() {
               comment._id === commentId
                 ? {
                     ...comment,
-                    replies: processedReplies,
+                    replies: [...(comment.replies || []), ...processedReplies],
                   }
                 : comment
             ),
@@ -285,7 +304,10 @@ export default function Home() {
                     comment._id === commentId
                       ? {
                           ...comment,
-                          replies: processedReplies,
+                          replies: [
+                            ...(comment.replies || []),
+                            ...processedReplies,
+                          ],
                         }
                       : comment
                   ),
@@ -311,12 +333,8 @@ export default function Home() {
       const token = localStorage.getItem("token");
       if (!token) return;
 
-      const response = await likeReply(
-        activeConfession._id,
-        commentId,
-        replyId,
-        token
-      );
+      // Replies are comments too; backend likes by commentId
+      const response = await likeComment(replyId, token);
 
       if (response.success) {
         // Update the active confession
@@ -332,8 +350,10 @@ export default function Home() {
                       reply._id === replyId
                         ? {
                             ...reply,
-                            likesCount: response.data.likesCount,
-                            hasLiked: response.data.hasLiked,
+                            likesCount: response.liked
+                              ? Number(reply.likesCount || 0) + 1
+                              : Math.max(0, Number(reply.likesCount || 0) - 1),
+                            hasLiked: response.liked,
                           }
                         : reply
                     ),
@@ -357,8 +377,13 @@ export default function Home() {
                             reply._id === replyId
                               ? {
                                   ...reply,
-                                  likesCount: response.data.likesCount,
-                                  hasLiked: response.data.hasLiked,
+                                  likesCount: response.liked
+                                    ? Number(reply.likesCount || 0) + 1
+                                    : Math.max(
+                                        0,
+                                        Number(reply.likesCount || 0) - 1
+                                      ),
+                                  hasLiked: response.liked,
                                 }
                               : reply
                           ),

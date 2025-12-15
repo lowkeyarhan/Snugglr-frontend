@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearAuth } from "../API/auth";
+import { logout } from "../userAPI/auth";
 import Dashboard from "../adminComp/dashboard";
 import Community from "../adminComp/community";
 import Confessions from "../adminComp/confessions";
@@ -25,8 +25,7 @@ export default function Admin() {
   const [activeView, setActiveView] = useState<ViewType>("dashboard");
 
   const handleLogout = () => {
-    clearAuth();
-    navigate("/auth");
+    logout();
   };
 
   const navItems = [
@@ -73,10 +72,11 @@ export default function Admin() {
                       setActiveView(item.view!);
                     }
                   }}
-                  className={`flex items-center gap-3 rounded-xl px-3 py-3.5 text-base font-normal transition-all duration-200 cursor-pointer group ${isActive
+                  className={`flex items-center gap-3 rounded-xl px-3 py-3.5 text-base font-normal transition-all duration-200 cursor-pointer group ${
+                    isActive
                       ? "bg-slate-100 dark:bg-slate-900/50 text-slate-900 dark:text-white"
                       : "text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900/50"
-                    }`}
+                  }`}
                 >
                   <span className="material-symbols-outlined text-[28px] group-hover:scale-105 transition-transform">
                     {item.icon}

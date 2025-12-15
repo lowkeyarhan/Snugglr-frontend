@@ -1,8 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import universityLogo from "../assets/university-logo.png";
-import { checkAdminStatus } from "../API/api";
-import { getAuthToken } from "../API/auth";
+import { getAuthToken, getUser } from "../userAPI/auth";
 
 interface SidebarProps {
   collapsed?: boolean;
@@ -34,9 +33,11 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
 
           if (!lastCheck || now - parseInt(lastCheck) > cacheExpiry) {
             hasCheckedAdmin.current = true;
-            const response = await checkAdminStatus(token);
-            setIsAdmin(response.isAdmin);
-            localStorage.setItem("isAdmin", response.isAdmin.toString());
+            const u = getUser();
+            const role = u?.role;
+            const nextIsAdmin = role === "admin" || role === "superadmin";
+            setIsAdmin(nextIsAdmin);
+            localStorage.setItem("isAdmin", nextIsAdmin.toString());
             localStorage.setItem("adminCheckTimestamp", now.toString());
           } else {
             hasCheckedAdmin.current = true;
