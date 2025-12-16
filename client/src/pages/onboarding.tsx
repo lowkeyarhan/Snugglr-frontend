@@ -1,18 +1,26 @@
 import { useState } from "react";
 import { updateUserProfile } from "../userAPI/user";
+import { useNavigate } from "react-router-dom";
+
+type SlideType = "slide1" | "slide2" | "slide3";
 
 export default function Onboarding() {
+  const navigate = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState<SlideType>("slide1");
   const [formData, setFormData] = useState({
     name: "",
-    university: "",
     dob: "",
     gender: "",
     pronouns: "",
-    interests: "",
-    topSong: "",
-    topMovie: "",
-    memeVibe: "",
-    hint: "",
+    contact: "",
+    favoriteArtists: "",
+    favoriteMovies: "",
+    favoriteAlbums: "",
+    favoriteCampusSpot: "",
+    loveLanguage: "",
+    quirkyFact: "",
+    idealDate: "",
+    fantasies: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -24,8 +32,8 @@ export default function Onboarding() {
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
     if (error) setError(null);
   };
 
@@ -42,21 +50,40 @@ export default function Onboarding() {
       const submitData: any = {};
 
       if (formData.name) submitData.name = formData.name;
-      if (formData.university) submitData.community = formData.university;
       if (formData.dob) submitData.birthday = formData.dob;
-      if (formData.gender) submitData.gender = formData.gender.toLowerCase();
+      if (formData.gender) submitData.gender = formData.gender;
       if (formData.pronouns) submitData.pronouns = formData.pronouns;
-      if (formData.hint) submitData.hint = formData.hint;
-      if (formData.topSong) submitData.musicPreferences = formData.topSong;
-      if (formData.topMovie) submitData.favoriteShows = formData.topMovie;
-      if (formData.memeVibe) submitData.memeVibe = formData.memeVibe;
-      if (formData.interests) {
-        const interestsArray = formData.interests
+      if (formData.contact) submitData.contact = formData.contact;
+
+      // Music and media preferences - convert comma-separated strings to arrays
+      if (formData.favoriteArtists) {
+        submitData.favArtists = formData.favoriteArtists
           .split(",")
-          .map((interest) => interest.trim())
-          .filter((interest) => interest.length > 0);
-        submitData.interests = interestsArray;
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
       }
+      if (formData.favoriteMovies) {
+        submitData.favMovies = formData.favoriteMovies
+          .split(",")
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      }
+      if (formData.favoriteAlbums) {
+        submitData.favAlbums = formData.favoriteAlbums
+          .split(",")
+          .map((item) => item.trim())
+          .filter((item) => item.length > 0);
+      }
+      if (formData.favoriteCampusSpot)
+        submitData.favSpotOnCampus = formData.favoriteCampusSpot;
+
+      // Personality traits
+      if (formData.loveLanguage)
+        submitData.loveLanguage = formData.loveLanguage;
+      if (formData.quirkyFact) submitData.hint = formData.quirkyFact;
+      if (formData.idealDate) submitData.idealDate = formData.idealDate;
+      if (formData.fantasies) submitData.fantasies = formData.fantasies;
+
       const result = await updateUserProfile(submitData, token);
 
       if (result.data) {
@@ -65,7 +92,7 @@ export default function Onboarding() {
 
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = "/home";
+        navigate("/home");
       }, 1500);
     } catch (err: any) {
       setError(err.message || "Failed to update profile. Please try again.");
@@ -75,324 +102,497 @@ export default function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-background-light dark:bg-background-dark">
+    <div className="bg-background-light dark:bg-background-dark font-display text-gray-800 dark:text-gray-200 min-h-screen flex flex-col overflow-hidden selection:bg-primary selection:text-white">
+      {/* Animated Background Blobs */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] bg-primary/20 rounded-full blur-[100px] animate-float opacity-60"></div>
+        <div
+          className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-pink-500/20 rounded-full blur-[100px] animate-float opacity-60"
+          style={{ animationDelay: "-3s" }}
+        ></div>
+      </div>
+
+      {/* Header */}
+      <header className="flex-none flex items-center justify-between px-6 sm:px-10 py-5 z-20 relative">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 text-primary bg-white dark:bg-card-dark rounded-full flex items-center justify-center shadow-lg ring-4 ring-primary/10">
+            <span className="material-symbols-outlined text-3xl">favorite</span>
+          </div>
+          <h2 className="text-2xl font-extrabold tracking-tight text-gray-900 dark:text-white">
+            Snugglr
+          </h2>
+        </div>
+        <button className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-primary transition-colors bg-white/50 dark:bg-black/20 px-4 py-2 rounded-full backdrop-blur-sm">
+          <span className="hidden sm:inline">Need Help?</span>
+          <span className="material-symbols-outlined">help</span>
+        </button>
+      </header>
+
       {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Title Section */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white tracking-tighter">
-              Almost there...
-            </h1>
-            <p className="mt-3 text-lg text-gray-500 dark:text-gray-400">
-              Craft your persona. Be unique, be real, be fun, be mysterious.
-            </p>
-          </div>
-
-          {/* Two Column Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Personal Info Card */}
-            <div className="bg-white dark:bg-card-dark rounded-xl shadow-lg dark:shadow-glow/50 border border-gray-200 dark:border-primary/20 p-6 flex flex-col">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-                Personal Info
-              </h3>
-              <div className="space-y-6 flex-grow flex flex-col">
-                <div className="flex-grow space-y-6">
-                  {/* Name */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="name"
-                    >
-                      Name
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="name"
-                      placeholder="What should we call you?"
-                      type="text"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* University */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="university"
-                    >
-                      University
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="university"
-                      placeholder="Where do you go to school?"
-                      type="text"
-                      value={formData.university}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* Date of Birth */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="dob"
-                    >
-                      When's your birthday?
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary text-gray-500"
-                      id="dob"
-                      type="date"
-                      value={formData.dob}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* Gender and Pronouns */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label
-                        className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                        htmlFor="gender"
-                      >
-                        What's your gender?
-                      </label>
-                      <select
-                        className="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
-                        id="gender"
-                        value={formData.gender}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label
-                        className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                        htmlFor="pronouns"
-                      >
-                        Pronouns
-                      </label>
-                      <select
-                        className="form-select w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary"
-                        id="pronouns"
-                        value={formData.pronouns}
-                        onChange={handleInputChange}
-                      >
-                        <option value="">Select</option>
-                        <option value="He/Him">He/Him</option>
-                        <option value="She/Her">She/Her</option>
-                        <option value="They/Them">They/Them</option>
-                        <option value="He/They">He/They</option>
-                        <option value="She/They">She/They</option>
-                        <option value="Ze/Hir">Ze/Hir</option>
-                        <option value="Ze/Zir">Ze/Zir</option>
-                        <option value="Xe/Xem">Xe/Xem</option>
-                        <option value="Ey/Em">Ey/Em</option>
-                        <option value="Ve/Ver">Ve/Ver</option>
-                        <option value="Fae/Faer">Fae/Faer</option>
-                        <option value="Per/Per">Per/Per</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Your World, Your Vibe Card */}
-            <div className="bg-white dark:bg-card-dark rounded-xl shadow-lg dark:shadow-glow/50 border border-gray-200 dark:border-primary/20 p-6 flex flex-col">
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
-                Your Vibe
-              </h3>
-              <div className="space-y-6 flex-grow flex flex-col">
-                <div className="flex-grow space-y-6">
-                  {/* Interests */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="interests"
-                    >
-                      Interests
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="interests"
-                      placeholder="e.g., Coding, Flirting, Reading etc."
-                      type="text"
-                      value={formData.interests}
-                      onChange={handleInputChange}
-                    />
-                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                      Separate interests with commas.
-                    </p>
-                  </div>
-
-                  {/* Your Anthem */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="topSong"
-                    >
-                      What do you listen to?
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="topSong"
-                      placeholder="e.g., Drake, Lana Del Rey, Kishore Kumar etc."
-                      type="text"
-                      value={formData.topSong}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* Favorite Movie/Show */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="topMovie"
-                    >
-                      What's your favorite shows?
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="topMovie"
-                      placeholder="e.g., My Fault, Friends, Saiyaara etc."
-                      type="text"
-                      value={formData.topMovie}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-
-                  {/* Meme Vibe */}
-                  <div>
-                    <label
-                      className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                      htmlFor="memeVibe"
-                    >
-                      Meme Vibe
-                    </label>
-                    <input
-                      className="w-full rounded-lg border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500"
-                      id="memeVibe"
-                      placeholder="Describe your sense of humor."
-                      type="text"
-                      value={formData.memeVibe}
-                      onChange={handleInputChange}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* The Mystery Section */}
-          <div className="bg-white dark:bg-card-dark rounded-xl shadow-lg dark:shadow-glow/50 border border-gray-200 dark:border-primary/20 p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-              {/* Avatar Placeholder */}
-              <div className="md:col-span-1 flex flex-col items-center">
-                <div className="flex h-32 w-32 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-800/50 border-2 border-dashed border-primary/50 items-center justify-center">
-                  <span className="material-symbols-outlined text-5xl text-gray-400 dark:text-gray-500">
-                    person
-                  </span>
-                </div>
-                <p className="mt-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                  Avatar upload coming soon!
-                </p>
-              </div>
-
-              {/* Hint */}
-              <div className="md:col-span-2">
-                <div className="text-center mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center justify-center gap-2 tracking-tight">
-                    The Mystery
-                  </h3>
-                  <p className="mt-2 text-base text-gray-500 dark:text-gray-400">
-                    Turn up the heat. Let them guess who you are. (Optional)
+      <main className="flex-1 flex flex-col items-center justify-center p-4 relative w-full max-w-6xl mx-auto h-full z-10">
+        {/* Slide Container */}
+        <div className="w-full max-w-4xl bg-card-light dark:bg-card-dark rounded-bubble shadow-2xl border border-gray-200 dark:border-primary/20 relative flex flex-col overflow-hidden h-[80vh] min-h-[650px]">
+          <div className="slides-container flex-1 relative w-full h-full p-8 sm:p-12 md:p-16 overflow-hidden">
+            {/* Slide 1: Personal Info */}
+            <div
+              className={`slide-content absolute top-0 left-0 w-full h-full flex flex-col ${
+                currentSlide === "slide1"
+                  ? "opacity-100 pointer-events-auto z-10"
+                  : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <div className="flex-1 overflow-y-auto scrollbar-hide p-8 sm:p-12 md:p-16">
+                <div className="mb-8 text-center sm:text-left">
+                  <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-3">
+                    Who are you?
+                  </h2>
+                  <p className="text-lg text-gray-500 dark:text-gray-400">
+                    Let's start with the basics. Keep it real!
                   </p>
                 </div>
-                <label
-                  className="block text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2"
-                  htmlFor="hint"
+
+                <div className="space-y-6 pb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Name */}
+                    <div className="col-span-1 md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Name / Alias
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                          badge
+                        </span>
+                        <input
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="Your name or cool nickname"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Date of Birth */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Date of Birth
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                          cake
+                        </span>
+                        <input
+                          name="dob"
+                          value={formData.dob}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white shadow-md dark:[color-scheme:dark]"
+                          type="date"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Gender */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Gender
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                          face
+                        </span>
+                        <select
+                          name="gender"
+                          value={formData.gender}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-10 text-lg text-gray-900 dark:text-white appearance-none cursor-pointer shadow-md"
+                        >
+                          <option value="">Select Identity</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="non-binary">Non-binary</option>
+                          <option value="other">Other</option>
+                          <option value="prefer-not-to-say">
+                            Prefer not to say
+                          </option>
+                        </select>
+                        <span className="material-symbols-outlined absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                          expand_more
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Pronouns */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Pronouns
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                          record_voice_over
+                        </span>
+                        <select
+                          name="pronouns"
+                          value={formData.pronouns}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-10 text-lg text-gray-900 dark:text-white appearance-none cursor-pointer shadow-md"
+                        >
+                          <option value="">Select Pronouns</option>
+                          <option value="she/her">she/her</option>
+                          <option value="he/him">he/him</option>
+                          <option value="they/them">they/them</option>
+                          <option value="ze/hir">ze/hir</option>
+                          <option value="Just my name">Just my name</option>
+                        </select>
+                        <span className="material-symbols-outlined absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                          expand_more
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Contact Number */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Contact Number
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500 transition-colors">
+                          call
+                        </span>
+                        <input
+                          name="contact"
+                          value={formData.contact}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="(555) 000-0000"
+                          type="tel"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-none p-8 sm:p-12 md:p-16 pt-0 flex justify-end">
+                <button
+                  onClick={() => setCurrentSlide("slide2")}
+                  className="flex items-center justify-center gap-3 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 text-white dark:text-gray-900 py-5 px-12 rounded-full font-bold shadow-xl w-full sm:w-auto"
                 >
-                  Hint
-                </label>
-                <textarea
-                  className="w-full rounded-[10px] border-gray-300 dark:border-gray-600 bg-background-light dark:bg-gray-800/50 resize-none focus:ring-primary focus:border-primary placeholder-gray-400 dark:placeholder-gray-500 text-base"
-                  id="hint"
-                  placeholder="Something quirky like “You'll always find me in the library” or “I'm a bit of a nerd”"
-                  rows={4}
-                  value={formData.hint}
-                  onChange={handleInputChange}
-                ></textarea>
+                  <span className="text-lg">Proceed</span>
+                  <span className="material-symbols-outlined">
+                    arrow_forward
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Slide 2: The Vibe Check */}
+            <div
+              className={`slide-content absolute top-0 left-0 w-full h-full flex flex-col ${
+                currentSlide === "slide2"
+                  ? "opacity-100 pointer-events-auto z-10"
+                  : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <div className="flex-1 overflow-y-auto scrollbar-hide p-8 sm:p-12 md:p-16">
+                <div className="mb-8 text-center sm:text-left">
+                  <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-3">
+                    The Vibe Check
+                  </h2>
+                  <p className="text-lg text-gray-500 dark:text-gray-400">
+                    Your taste in art and places says a lot.
+                  </p>
+                </div>
+
+                <div className="space-y-6 pb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Favorite Artists */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Favorite Artists
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500">
+                          queue_music
+                        </span>
+                        <input
+                          name="favoriteArtists"
+                          value={formData.favoriteArtists}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="Who's topping your playlist?"
+                          type="text"
+                        />
+                      </div>
+                      <p className="mt-1 ml-4 text-xs text-gray-500 dark:text-gray-400">
+                        Separate with commas
+                      </p>
+                    </div>
+
+                    {/* Favorite Movies */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Favorite Movies
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500">
+                          movie
+                        </span>
+                        <input
+                          name="favoriteMovies"
+                          value={formData.favoriteMovies}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="Comfort films or cinema?"
+                          type="text"
+                        />
+                      </div>
+                      <p className="mt-1 ml-4 text-xs text-gray-500 dark:text-gray-400">
+                        Separate with commas
+                      </p>
+                    </div>
+
+                    {/* Favorite Albums */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Favorite Albums
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500">
+                          album
+                        </span>
+                        <input
+                          name="favoriteAlbums"
+                          value={formData.favoriteAlbums}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="No-skip masterpieces"
+                          type="text"
+                        />
+                      </div>
+                      <p className="mt-1 ml-4 text-xs text-gray-500 dark:text-gray-400">
+                        Separate with commas
+                      </p>
+                    </div>
+
+                    {/* Favorite Campus Spot */}
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Favorite Spot on Campus
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500">
+                          location_on
+                        </span>
+                        <input
+                          name="favoriteCampusSpot"
+                          value={formData.favoriteCampusSpot}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="Library 3rd floor, The Quad, Hidden cafe..."
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-none p-8 sm:p-12 md:p-16 pt-0 flex justify-between gap-3">
+                <button
+                  onClick={() => setCurrentSlide("slide1")}
+                  className="flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-5 px-10 rounded-full font-bold shadow-lg"
+                >
+                  <span className="material-symbols-outlined">arrow_back</span>
+                  <span className="text-base">Previous</span>
+                </button>
+                <button
+                  onClick={() => setCurrentSlide("slide3")}
+                  className="flex items-center justify-center gap-3 bg-gray-900 dark:bg-white hover:bg-black dark:hover:bg-gray-200 text-white dark:text-gray-900 py-5 px-12 rounded-full font-bold shadow-xl w-full sm:w-auto"
+                >
+                  <span className="text-lg">Proceed</span>
+                  <span className="material-symbols-outlined">
+                    arrow_forward
+                  </span>
+                </button>
+              </div>
+            </div>
+
+            {/* Slide 3: Deep Dive */}
+            <div
+              className={`slide-content absolute top-0 left-0 w-full h-full flex flex-col ${
+                currentSlide === "slide3"
+                  ? "opacity-100 pointer-events-auto z-10"
+                  : "opacity-0 pointer-events-none"
+              }`}
+            >
+              <div className="flex-1 overflow-y-auto scrollbar-hide p-8 sm:p-12 md:p-16">
+                <div className="mb-8 text-center sm:text-left">
+                  <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 dark:text-white mb-3">
+                    Deep Dive
+                  </h2>
+                  <p className="text-lg text-gray-500 dark:text-gray-400">
+                    Let's get real. What makes you, you?
+                  </p>
+                </div>
+
+                <div className="space-y-6 pb-4">
+                  <div className="grid grid-cols-1 gap-6">
+                    {/* Love Language */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        Love Language
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-pink-500">
+                          favorite_border
+                        </span>
+                        <input
+                          name="loveLanguage"
+                          value={formData.loveLanguage}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 shadow-md"
+                          placeholder="e.g., Words of Affirmation, Quality Time"
+                          type="text"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Quirky Fact */}
+                    <div>
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                        A Quirky Fact About You
+                      </label>
+                      <div className="relative group">
+                        <span className="material-symbols-outlined absolute left-5 top-6 text-gray-400 group-focus-within:text-pink-500">
+                          psychology
+                        </span>
+                        <textarea
+                          name="quirkyFact"
+                          value={formData.quirkyFact}
+                          onChange={handleInputChange}
+                          className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 resize-none h-28 shadow-md"
+                          placeholder="I collect strangely shaped rocks..."
+                        />
+                      </div>
+                    </div>
+
+                    {/* Ideal Date and Fantasies */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Ideal Date */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                          Ideal Date
+                        </label>
+                        <div className="relative group">
+                          <span className="material-symbols-outlined absolute left-5 top-6 text-gray-400 group-focus-within:text-pink-500">
+                            local_cafe
+                          </span>
+                          <textarea
+                            name="idealDate"
+                            value={formData.idealDate}
+                            onChange={handleInputChange}
+                            className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 resize-none h-32 shadow-md"
+                            placeholder="Coffee and a long walk..."
+                          />
+                        </div>
+                      </div>
+
+                      {/* Fantasies */}
+                      <div>
+                        <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2 ml-4">
+                          Fantasies
+                        </label>
+                        <div className="relative group">
+                          <span className="material-symbols-outlined absolute left-5 top-6 text-gray-400 group-focus-within:text-pink-500">
+                            auto_awesome
+                          </span>
+                          <textarea
+                            name="fantasies"
+                            value={formData.fantasies}
+                            onChange={handleInputChange}
+                            className="form-input w-full bg-white dark:bg-bubble-dark border-2 border-transparent focus:border-pink-500/25 focus:ring-0 rounded-bubble-sm py-5 pl-14 pr-6 text-lg text-gray-900 dark:text-white placeholder-gray-400 resize-none h-32 shadow-md"
+                            placeholder="Traveling the world in a van..."
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Error Message */}
+                {error && (
+                  <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                    <p className="text-sm text-red-600 dark:text-red-400 text-center">
+                      {error}
+                    </p>
+                  </div>
+                )}
+
+                {/* Success Message */}
+                {success && (
+                  <div className="mt-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <p className="text-sm text-green-600 dark:text-green-400 text-center">
+                      Profile updated successfully! Redirecting...
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex-none p-8 sm:p-12 md:p-16 pt-0 flex justify-between gap-3">
+                <button
+                  onClick={() => setCurrentSlide("slide2")}
+                  className="flex items-center justify-center gap-2 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-5 px-10 rounded-full font-bold shadow-lg"
+                >
+                  <span className="material-symbols-outlined">arrow_back</span>
+                  <span className="text-base">Previous</span>
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="flex items-center justify-center gap-3 bg-pink-600 text-white py-5 px-12 rounded-full font-bold hover:bg-pink-500 text-white shadow-lg shadow-pink-500/30 w-full sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? (
+                    <>
+                      <svg
+                        className="animate-spin h-6 w-6 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span className="text-lg">Finish Setup</span>
+                      <span className="material-symbols-outlined">
+                        check_circle
+                      </span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
-
-          {/* Error Message */}
-          {error && (
-            <div className="mt-6 p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 max-w-md mx-auto">
-              <p className="text-sm text-red-600 dark:text-red-400 text-center">
-                {error}
-              </p>
-            </div>
-          )}
-
-          {/* Success Message */}
-          {success && (
-            <div className="mt-6 p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 max-w-md mx-auto">
-              <p className="text-sm text-green-600 dark:text-green-400 text-center">
-                Profile updated successfully! Redirecting...
-              </p>
-            </div>
-          )}
-
-          {/* Submit Button */}
-          <div className="mt-8">
-            <button
-              className="w-full max-w-md mx-auto flex items-center justify-center rounded-full h-16 px-8 bg-primary text-white text-xl font-bold hover:opacity-90 transition-all duration-300 shadow-lg shadow-primary/40 dark:shadow-glow transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              onClick={handleSubmit}
-              disabled={loading}
-            >
-              {loading ? (
-                <>
-                  <svg
-                    className="animate-spin h-6 w-6 text-white mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <span>Save &amp; Continue</span>
-                  <span className="material-symbols-outlined ml-2">
-                    arrow_forward
-                  </span>
-                </>
-              )}
-            </button>
-          </div>
         </div>
+
+        <p className="mt-8 text-center text-gray-500 dark:text-gray-500 text-sm font-medium z-10">
+          Snugglr © 2023. Anonymous. Safe. Fun.
+        </p>
       </main>
     </div>
   );
