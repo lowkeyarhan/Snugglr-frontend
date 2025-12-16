@@ -272,7 +272,7 @@ router.post(
 
 /**
  * @swagger
- * /confession/{commentId}/like:
+ * /confession/comment/{commentId}/like:
  *   post:
  *     summary: Like or unlike a comment
  *     tags: [Comments]
@@ -306,7 +306,8 @@ router.post(
  *       500:
  *         description: Internal server error
  */
-router.post("/:commentId/like", authMiddleware, likeComment);
+// IMPORTANT: this must NOT be `/:commentId/like` because it conflicts with `/:confessionId/like`
+router.post("/comment/:commentId/like", authMiddleware, likeComment);
 
 /**
  * @swagger

@@ -1,558 +1,645 @@
-import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import LandingNavbar from "../components/landingNavbar";
-
-// Animation variants
-const fadeInUp = {
-  hidden: { opacity: 0, y: 60 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.6,
-      ease: "easeInOut" as const,
-    },
-  },
-};
-
-const fadeIn = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 0.8,
-      ease: "easeInOut" as const,
-    },
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-const scaleIn = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: "easeInOut" as const,
-    },
-  },
-};
 
 export default function Landing() {
   const navigate = useNavigate();
 
-  const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-
   return (
-    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
-      <div className="layout-container flex h-full grow flex-col">
-        {/* Header */}
-        <LandingNavbar />
+    <div
+      className="scroll-smooth bg-white font-display text-slate-900 antialiased selection:bg-primary/20 selection:text-primary"
+      style={{ fontFeatureSettings: '"kern" 1, "liga" 1' }}
+    >
+      {/* Background Pattern */}
+      <div className="fixed inset-0 z-0 bg-doodle-subtle pointer-events-none"></div>
 
-        <main className="flex flex-1 flex-col">
-          {/* Hero Section */}
-          <section className="relative py-24 px-6 lg:py-40 flex items-center justify-center text-center bg-background-light dark:bg-background-dark overflow-hidden">
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-5 dark:opacity-[0.02]"
-              style={{
-                backgroundImage:
-                  'url("https://lh3.googleusercontent.com/aida-public/AB6AXuBPNUtP6p0RzHOciXbE3TJ_SlPabWU10wvcrcS1NfcmCe8-KLoowO6fJ8KzfOUpQ4R-aDDDvqG_-96HReXbCRvtRaJ1YG5nYMnlPogB2LeBxd7gQtJsAZ5dHaXOik-kK_xEpHpQDkoY6gyIw17Vmcnk6xFEscj5iYQVsaGGqUtBCw6IAS51XhZQE7QBnghWCCjCjMLy0y_CJCTxsxM0lkrO7E4zG3mGZUXCbiX0hEPleuJ2Kf36Grwb2Crz_EdT3-zva99VFi0WUY25")',
-              }}
-            ></div>
-            <div className="absolute -top-40 -left-40 w-96 h-96 bg-secondary/20 rounded-full blur-3xl opacity-50"></div>
-            <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-primary/20 rounded-full blur-3xl opacity-50"></div>
-            <motion.div
-              className="relative z-10 max-w-4xl mx-auto"
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer}
+      {/* Header */}
+      <header className="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="material-symbols-outlined text-primary text-3xl">
+              favorite
+            </span>
+            <span
+              className="text-2xl font-extrabold tracking-[-0.02em]"
+              style={{ fontFamily: "'Pacifico', cursive" }}
             >
-              <motion.h1
-                className="text-5xl md:text-7xl font-extrabold tracking-tighter font-pacifico text-text-light dark:text-text-dark"
-                variants={fadeInUp}
-              >
-                Snugglr
-              </motion.h1>
-              <motion.p
-                className="mt-8 text-xl md:text-2xl text-text-muted-light dark:text-text-muted-dark max-w-2xl mx-auto"
-                variants={fadeInUp}
-              >
-                The anonymous college dating app where personality comes first.
-                Match, confess, and chat anonymously.
-              </motion.p>
-              <motion.div
-                className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-                variants={fadeInUp}
-              >
-                <button
-                  onClick={() => scrollToSection("signup")}
-                  className="flex items-center justify-center w-full sm:w-auto overflow-hidden rounded-full h-14 px-10 bg-primary text-white text-lg font-bold tracking-wide shadow-lifted hover:bg-primary-dark transform hover:scale-105 transition-all duration-300 cursor-pointer"
-                >
-                  <span className="truncate">Get Early Access</span>
-                  <span className="material-symbols-outlined ml-2">
-                    arrow_forward
-                  </span>
-                </button>
-                <button
-                  onClick={() => navigate("/auth")}
-                  className="flex items-center justify-center w-full sm:w-auto overflow-hidden rounded-full h-14 px-10 bg-card-light/50 dark:bg-card-dark/50 backdrop-blur-md text-text-light dark:text-text-dark text-lg font-bold tracking-wide shadow-lifted hover:bg-gray-100/70 dark:hover:bg-card-dark/70 transform hover:scale-105 transition-all duration-300 border border-gray-200/50 dark:border-gray-700/50 cursor-pointer"
-                >
-                  <span className="truncate">Join now</span>
-                </button>
-              </motion.div>
-              <motion.p
-                className="mt-8 text-sm text-text-muted-light dark:text-text-muted-dark"
-                variants={fadeIn}
-              >
-                Currently in development. Available soon for select colleges.
-              </motion.p>
-            </motion.div>
-          </section>
-
-          {/* How It Works Section */}
-          <section
-            className="py-24 px-6 bg-background-light dark:bg-background-dark"
-            id="how-it-works"
-          >
-            <div className="container mx-auto">
-              <motion.div
-                className="text-center mb-16 max-w-3xl mx-auto"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeInUp}
-              >
-                <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-text-light dark:text-text-dark">
-                  Your Journey on Snugglr
-                </h2>
-                <p className="mt-4 text-lg text-text-muted-light dark:text-text-muted-dark">
-                  A step-by-step guide to finding your connection, from
-                  anonymous first impressions to the big reveal.
-                </p>
-              </motion.div>
-              <motion.div
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={staggerContainer}
-              >
-                <motion.div
-                  className="flex flex-col items-center text-center p-8 rounded-xl glass-effect shadow-soft transition-all hover:shadow-lifted hover:-translate-y-1"
-                  variants={scaleIn}
-                >
-                  <div className="p-4 bg-primary/10 dark:bg-primary/20 text-primary rounded-full mb-6 text-4xl">
-                    1
-                  </div>
-                  <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Sign Up & Build Your Vibe
-                  </h3>
-                  <p className="mt-2 text-sm text-text-muted-light dark:text-text-muted-dark">
-                    Join with your .edu email. Instead of photos, you'll share
-                    your favorite memes, music, movies, and personality traits.
-                    This is your 'vibe profile'.
-                  </p>
-                </motion.div>
-                <motion.div
-                  className="flex flex-col items-center text-center p-8 rounded-xl glass-effect shadow-soft transition-all hover:shadow-lifted hover:-translate-y-1"
-                  variants={scaleIn}
-                >
-                  <div className="p-4 bg-primary/10 dark:bg-primary/20 text-primary rounded-full mb-6 text-4xl">
-                    2
-                  </div>
-                  <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Date or Pass
-                  </h3>
-                  <p className="mt-2 text-sm text-text-muted-light dark:text-text-muted-dark">
-                    We'll show you anonymous vibe profiles from your campus.
-                    Swipe right to 'Date' if you like their vibe, or left to
-                    'Pass'. It's all about character, not just looks.
-                  </p>
-                </motion.div>
-                <motion.div
-                  className="flex flex-col items-center text-center p-8 rounded-xl glass-effect shadow-soft transition-all hover:shadow-lifted hover:-translate-y-1"
-                  variants={scaleIn}
-                >
-                  <div className="p-4 bg-primary/10 dark:bg-primary/20 text-primary rounded-full mb-6 text-4xl">
-                    3
-                  </div>
-                  <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Confess & Match
-                  </h3>
-                  <p className="mt-2 text-sm text-text-muted-light dark:text-text-muted-dark">
-                    If you both choose 'Date', it's a match! You can then send
-                    an anonymous "confession" to break the ice before you start
-                    chatting.
-                  </p>
-                </motion.div>
-                <motion.div
-                  className="flex flex-col items-center text-center p-8 rounded-xl glass-effect shadow-soft transition-all hover:shadow-lifted hover:-translate-y-1"
-                  variants={scaleIn}
-                >
-                  <div className="p-4 bg-primary/10 dark:bg-primary/20 text-primary rounded-full mb-6 text-4xl">
-                    4
-                  </div>
-                  <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Chat & Reveal
-                  </h3>
-                  <p className="mt-2 text-sm text-text-muted-light dark:text-text-muted-dark">
-                    Get to know each other through anonymous chat. When you're
-                    both comfortable, you can choose to reveal your full
-                    profiles and see who you've been talking to.
-                  </p>
-                </motion.div>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Features Section */}
-          <section
-            className="py-24 px-6 bg-card-light dark:bg-card-dark"
-            id="features"
-          >
-            <div className="container mx-auto grid md:grid-cols-2 gap-16 items-center">
-              <motion.div
-                className="w-full h-96 md:h-full bg-center bg-cover rounded-lg shadow-lifted relative overflow-hidden"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeIn}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                <img
-                  alt="Students laughing"
-                  className="w-full h-full object-cover"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuiewzbGw7F_Pi8NZ5PYO_boEQtzzobNPtKf8fUJfuEIP6vzOJs6UdYdEHA4t_WjywILVTE53UQYb_4BtNPXYHOaKbUptuHdX2lRMSlemc5xkq8HaEtjRRLYiAxP9bc2XaJ5Rdm6rLIlGw3IRG3EqwxKsoQi9Q5JxCmh1tnmD3mNDmd9hIz1pXjxd9wxYJNmZOftgCGbexVFYrudHhDFFKrYIYcWjb0cjXfOhflXuYLKS03V7ynBrPjntXrYfntQnPSkZ88wxFMfxo"
-                />
-                <div className="absolute bottom-0 left-0 p-8">
-                  <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-white">
-                    More Than Just a Swipe
-                  </h2>
-                  <p className="mt-4 text-lg text-white/90">
-                    We're building features that spark genuine connection and
-                    fun.
-                  </p>
-                </div>
-              </motion.div>
-              <motion.div
-                className="space-y-8"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={staggerContainer}
-              >
-                <motion.div
-                  className="flex items-start gap-4"
-                  variants={fadeInUp}
-                >
-                  <div className="flex-shrink-0 p-3 bg-secondary/10 dark:bg-secondary/20 text-secondary rounded-full mt-1">
-                    <span className="material-symbols-outlined">
-                      theater_comedy
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                      Vibe-Based Matching
-                    </h3>
-                    <p className="mt-1 text-text-muted-light dark:text-text-muted-dark">
-                      Connect over what you love. Our algorithm prioritizes
-                      shared tastes in memes, music, movies, and core
-                      personality traits to find you a compatible match.
-                    </p>
-                  </div>
-                </motion.div>
-                <motion.div
-                  className="flex items-start gap-4"
-                  variants={fadeInUp}
-                >
-                  <div className="flex-shrink-0 p-3 bg-secondary/10 dark:bg-secondary/20 text-secondary rounded-full mt-1">
-                    {/* Anonymous mask icon for "incognito" */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 32 32"
-                      fill="none"
-                      className="w-7 h-7"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M7 15c1-3.5 4.2-7 9-7s8 3.5 9 7"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        fill="none"
-                      />
-                      <ellipse
-                        cx="11"
-                        cy="20"
-                        rx="2.2"
-                        ry="1.3"
-                        fill="currentColor"
-                        opacity="0.7"
-                      />
-                      <ellipse
-                        cx="21"
-                        cy="20"
-                        rx="2.2"
-                        ry="1.3"
-                        fill="currentColor"
-                        opacity="0.7"
-                      />
-                      <path
-                        d="M16 15.5a1 1 0 0 1 1-1c.5 0 3 .7 5.5.5"
-                        stroke="currentColor"
-                        strokeWidth="1.1"
-                        strokeLinecap="round"
-                        fill="none"
-                        opacity="0.8"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                      Anonymous Confessions
-                    </h3>
-                    <p className="mt-1 text-text-muted-light dark:text-text-muted-dark">
-                      Break the ice with a fun, anonymous message. It's a
-                      low-pressure way to show you're interested and see if
-                      there's a spark.
-                    </p>
-                  </div>
-                </motion.div>
-                <motion.div
-                  className="flex items-start gap-4"
-                  variants={fadeInUp}
-                >
-                  <div className="flex-shrink-0 p-3 bg-secondary/10 dark:bg-secondary/20 text-secondary rounded-full mt-1">
-                    <span className="material-symbols-outlined">
-                      chat_bubble
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold font-display text-text-light dark:text-text-dark">
-                      Pressure-Free Chat
-                    </h3>
-                    <p className="mt-1 text-text-muted-light dark:text-text-muted-dark">
-                      Chats are fully anonymous until both people agree to
-                      reveal. Focus on the conversation and get to know the
-                      person, not just the profile picture.
-                    </p>
-                  </div>
-                </motion.div>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* FAQ Section */}
-          <section
-            className="py-24 px-6 bg-background-light dark:bg-background-dark"
-            id="faq"
-          >
-            <div className="container mx-auto max-w-4xl">
-              <motion.div
-                className="text-center mb-16"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={fadeInUp}
-              >
-                <h2 className="text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-text-light dark:text-text-dark">
-                  Frequently Asked Questions
-                </h2>
-              </motion.div>
-              <motion.div
-                className="space-y-4"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={staggerContainer}
-              >
-                <motion.details
-                  className="group p-6 rounded-xl glass-effect shadow-soft cursor-pointer transition-all hover:shadow-lifted"
-                  variants={fadeInUp}
-                >
-                  <summary className="flex items-center justify-between text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    When will Snugglr be available at my college?
-                    <span className="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
-                      expand_more
-                    </span>
-                  </summary>
-                  <p className="mt-4 text-text-muted-light dark:text-text-muted-dark">
-                    We are launching on a campus-by-campus basis. Sign up for
-                    our waitlist with your .edu email, and we'll notify you as
-                    soon as Snugglr is live at your school!
-                  </p>
-                </motion.details>
-                <motion.details
-                  className="group p-6 rounded-xl glass-effect shadow-soft cursor-pointer transition-all hover:shadow-lifted"
-                  variants={fadeInUp}
-                >
-                  <summary className="flex items-center justify-between text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Is Snugglr really anonymous?
-                    <span className="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
-                      expand_more
-                    </span>
-                  </summary>
-                  <p className="mt-4 text-text-muted-light dark:text-text-muted-dark">
-                    Yes. Your identity is completely hidden. Other users will
-                    only see your Vibe Profile (memes, music, etc.) and your
-                    college. Your name and photos are only revealed when both
-                    you and your match consent.
-                  </p>
-                </motion.details>
-                <motion.details
-                  className="group p-6 rounded-xl glass-effect shadow-soft cursor-pointer transition-all hover:shadow-lifted"
-                  variants={fadeInUp}
-                >
-                  <summary className="flex items-center justify-between text-xl font-bold font-display text-text-light dark:text-text-dark">
-                    Do I need to download an app?
-                    <span className="material-symbols-outlined transition-transform duration-300 group-open:rotate-180 text-primary">
-                      expand_more
-                    </span>
-                  </summary>
-                  <p className="mt-4 text-text-muted-light dark:text-text-muted-dark">
-                    Nope! Snugglr is a progressive web app (PWA), meaning it
-                    runs in your browser. No app store downloads needed. For
-                    quick access, you can add it to your home screen.
-                  </p>
-                </motion.details>
-              </motion.div>
-            </div>
-          </section>
-
-          {/* Signup CTA Section */}
-          <section
-            className="py-24 px-6 bg-primary dark:bg-primary-dark"
-            id="signup"
-          >
-            <motion.div
-              className="container mx-auto text-center max-w-3xl"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
+              Snugglr
+            </span>
+          </div>
+          <nav className="hidden md:flex gap-8">
+            <a
+              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+              href="#how-it-works"
             >
-              <motion.h2
-                className="text-4xl lg:text-5xl font-extrabold tracking-tight font-display text-white"
-                variants={fadeInUp}
-              >
-                Be the First to Know
-              </motion.h2>
-              <motion.p
-                className="mt-4 text-lg text-white/80"
-                variants={fadeInUp}
-              >
-                Snugglr is coming soon. Join the waitlist with your college
-                email to get exclusive early access and updates. It's time for a
-                better way to date.
-              </motion.p>
-              <motion.div
-                className="mt-10 flex justify-center"
-                variants={fadeInUp}
-              >
-                <form className="flex flex-col sm:flex-row gap-4 w-full max-w-md">
-                  <input
-                    className="flex-grow h-14 px-6 rounded-full bg-white/20 text-white placeholder-white/70 border-0 focus:ring-2 focus:ring-white transition duration-300"
-                    placeholder="your.name@college.edu"
-                    type="email"
-                  />
-                  <button
-                    className="flex items-center w-full justify-center overflow-hidden rounded-full h-14 px-10 bg-white text-primary text-lg font-bold tracking-wide shadow-lifted hover:bg-gray-200 transform hover:scale-105 transition-all duration-300"
-                    type="submit"
-                  >
-                    <span className="truncate">Join Waitlist</span>
-                  </button>
-                </form>
-              </motion.div>
-            </motion.div>
-          </section>
-        </main>
+              How it Works
+            </a>
+            <a
+              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+              href="#safety"
+            >
+              Safety
+            </a>
+            <a
+              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+              href="#community"
+            >
+              Community
+            </a>
+          </nav>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => navigate("/auth")}
+              className="text-sm font-display font-extrabold text-gray-900 hover:text-primary transition-colors hidden sm:block tracking-tight"
+            >
+              Log in
+            </button>
+            <button
+              onClick={() => navigate("/auth")}
+              className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-full text-sm font-display font-extrabold transition-all transform hover:scale-105 tracking-tight"
+            >
+              Start Matching
+            </button>
+          </div>
+        </div>
+      </header>
 
-        {/* Footer */}
-        <footer className="bg-card-light dark:bg-card-dark border-t border-gray-200/80 dark:border-gray-800/50">
-          <div className="container mx-auto py-12 px-6">
-            <div className="flex flex-col items-center gap-6">
-              {/* Logo and Tagline */}
-              <div className="text-center">
-                <h3 className="text-2xl font-bold font-pacifico text-primary mb-2">
-                  Snugglr
-                </h3>
-                <p className="text-sm text-text-muted-light dark:text-text-muted-dark">
-                  Where personality comes first
-                </p>
-              </div>
-
-              {/* Navigation Links */}
-              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-                <button
-                  onClick={() => scrollToSection("how-it-works")}
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
-                >
-                  How it Works
-                </button>
-                <button
-                  onClick={() => scrollToSection("features")}
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
-                >
-                  Features
-                </button>
-                <button
-                  onClick={() => scrollToSection("faq")}
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
-                >
-                  FAQ
-                </button>
-                <span className="text-text-muted-light dark:text-text-muted-dark">
-                  •
+      {/* Main Content */}
+      <main className="relative z-10 pt-20">
+        {/* Hero Section */}
+        <section className="max-w-7xl mx-auto px-6 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="flex flex-col gap-8 fade-in-up">
+            <div className="inline-flex items-center gap-2 self-start bg-gray-100 px-3 py-1 rounded-full">
+              <span className="material-symbols-outlined text-primary text-xs">
+                verified
+              </span>
+              <span className="text-xs font-extrabold uppercase tracking-[0.1em] text-gray-600">
+                Verified Students Only
+              </span>
+            </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-[-0.03em] text-gray-900 leading-[1.05]">
+              Your Campus.
+              <br />
+              Your Mystery.
+              <br />
+              <span className="text-primary">Your Match.</span>
+            </h1>
+            <p className="text-xl text-gray-500 leading-[1.7] max-w-lg font-medium">
+              The premium anonymous dating experience designed exclusively for
+              university students. Connect authentically, without the pressure.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 pt-2">
+              <button
+                onClick={() => navigate("/auth")}
+                className="bg-black text-white px-8 py-4 rounded-lg text-base font-display font-extrabold transition-all hover:bg-gray-800 flex items-center justify-center gap-2 shadow-lg shadow-black/30 tracking-tight"
+              >
+                <span>Start Matching</span>
+                <span className="material-symbols-outlined text-sm">
+                  arrow_forward
                 </span>
-                <a
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors"
-                  href="mailto:hello@snugglr.app"
-                >
-                  Contact
-                </a>
-                <button
-                  onClick={(e) => e.preventDefault()}
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
-                >
-                  Privacy Policy
-                </button>
-                <button
-                  onClick={(e) => e.preventDefault()}
-                  className="text-sm text-text-muted-light dark:text-text-muted-dark hover:text-primary dark:hover:text-primary transition-colors cursor-pointer"
-                >
-                  Terms of Service
-                </button>
-              </div>
-
-              {/* Bottom Section */}
-              <div className="text-center pt-4 border-t border-gray-200/50 dark:border-gray-800/50 w-full max-w-2xl">
-                <p className="text-sm text-text-muted-light dark:text-text-muted-dark">
-                  © 2024 Snugglr. All rights reserved.
+              </button>
+              <button
+                onClick={() => {
+                  const element = document.getElementById("how-it-works");
+                  element?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-8 py-4 rounded-lg text-base font-display font-extrabold text-gray-900 border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-all flex items-center justify-center tracking-tight"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
+          <div className="relative h-[500px] lg:h-[600px] w-full rounded-2xl overflow-hidden shadow-2xl fade-in-up delay-200 group">
+            <img
+              alt="Students socializing"
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkMDS5Evx1RgqXhP_CJVz1cD1w--n4xyWl1Aud4J0YNfYD29CVbEoUsRYof3AI5ZsYjvKPB0efnaRV4tJ83Z1p5rO0qNMuUEVVZuCckAzVxl51NZA9dOPpu8V4qJe1s1CFEMqBfWPZFdknY6nagLq2_D3dGof1xTxLi7_jWjQtjsDjAu0cc64Q94bcr2jh6ydJbluau1IkADeQjQbkWRBTueB-R0PtEf5dvYzrk5zuQxnOtul1lFs77QVWoiQ5mUmN5rL5wg4OIQEq"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            <div className="absolute bottom-8 left-8 right-8 text-white">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="flex -space-x-3">
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-200">
+                    <img
+                      alt="User"
+                      className="w-full h-full object-cover"
+                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU-Eg2RAKTKdNmiCNzAi737Bvn0bDn1dXQAU3tb1-rp3Kx5I2jo768H7oYyysxPOFIg3dSmc5mHeafwii72nlr-dbA1Jvxak-cgvjgtLuiQDJoIVeKHa4yrqzVCXQGiL89OMRFEHOvvz5k2DXHWaJcxQIehhBDITdpa20i6C7g5iTslOt6Rfut6U9nNyLl7h01fvttmZu_Cw0fSHyE7d9aOZ5gzPelYSA4AXlyDKfrvy2RvIEBXdhXCEfnyGjUvSOr3tZt8fd5Gr-W"
+                    />
+                  </div>
+                  <div className="w-10 h-10 rounded-full border-2 border-white overflow-hidden bg-gray-300 flex items-center justify-center text-gray-500 text-xs font-display font-bold">
+                    +2k
+                  </div>
+                </div>
+                <p className="font-semibold text-sm text-white/90">
+                  Students active now
                 </p>
-                <p className="text-xs text-text-muted-light dark:text-text-muted-dark mt-2">
-                  Built with ❤️ by Arhan for college students everywhere
+              </div>
+              <p className="text-lg font-display font-bold tracking-tight">
+                Find your vibe at your university.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Why Snugglr Section */}
+        <section className="bg-gray-50 py-24 border-y rounded-bubble border-gray-100">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center max-w-2xl mx-auto mb-16 fade-in-up">
+              <h2 className="text-3xl lg:text-4xl font-display font-extrabold mb-4 tracking-tight">
+                Why Snugglr?
+              </h2>
+              <p className="text-gray-500 text-lg leading-relaxed font-body">
+                We've reimagined campus dating to prioritize safety, mystery,
+                and genuine connection.
+              </p>
+            </div>
+            <div className="grid md:grid-cols-3 gap-10">
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow fade-in-up delay-100">
+                <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center mb-6">
+                  <span className="material-symbols-outlined text-3xl">
+                    verified_user
+                  </span>
+                </div>
+                <h3 className="text-xl font-display font-extrabold mb-3 tracking-tight">
+                  Verified Students Only
+                </h3>
+                <p className="text-gray-500 leading-[1.6] text-sm font-body font-medium">
+                  Exclusive access. We verify every user via their .edu email to
+                  ensure a safe, bot-free environment for real students.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow fade-in-up delay-200">
+                <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-lg flex items-center justify-center mb-6">
+                  <span className="material-symbols-outlined text-3xl">
+                    visibility_off
+                  </span>
+                </div>
+                <h3 className="text-xl font-display font-extrabold mb-3 tracking-tight">
+                  Total Anonymity
+                </h3>
+                <p className="text-gray-500 leading-[1.6] text-sm font-body font-medium">
+                  Express yourself freely. Your identity remains hidden until
+                  you decide to reveal it. No pressure, just connection.
+                </p>
+              </div>
+              <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow fade-in-up delay-300">
+                <div className="w-14 h-14 bg-pink-50 text-pink-500 rounded-lg flex items-center justify-center mb-6">
+                  <span className="material-symbols-outlined text-3xl">
+                    favorite
+                  </span>
+                </div>
+                <h3 className="text-xl font-display font-extrabold mb-3 tracking-tight">
+                  Personality First
+                </h3>
+                <p className="text-gray-500 leading-[1.6] text-sm font-body font-medium">
+                  Go beyond the surface. Our matching algorithm connects you
+                  based on shared interests, vibes, and campus bubbles.
                 </p>
               </div>
             </div>
           </div>
+        </section>
+
+        {/* How it Works Section */}
+        <section className="py-24 overflow-hidden" id="how-it-works">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row gap-16 items-center">
+              <div className="lg:w-1/2 fade-in-up">
+                <h2 className="text-4xl font-display font-extrabold mb-6 tracking-tight">
+                  How it Works
+                </h2>
+                <p className="text-lg text-gray-500 mb-10 leading-relaxed font-body font-medium">
+                  From signup to your first date, the Snugglr journey is
+                  designed to be seamless, safe, and exciting.
+                </p>
+                <div className="space-y-8">
+                  <div className="flex gap-6">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-display font-bold text-lg">
+                      1
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-display font-extrabold text-gray-900 tracking-tight">
+                        Sign up with .edu
+                      </h4>
+                      <p className="text-gray-500 mt-2 leading-relaxed font-body font-medium">
+                        Join using your university email to verify your student
+                        status instantly.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center font-display font-extrabold text-lg">
+                      2
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-display font-extrabold text-gray-900 tracking-tight">
+                        Create your Persona
+                      </h4>
+                      <p className="text-gray-500 mt-2 leading-relaxed font-body font-medium">
+                        Build an anonymous profile highlighting your interests,
+                        major, and what you're looking for.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-6">
+                    <div className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-100 text-gray-900 flex items-center justify-center font-display font-extrabold text-lg">
+                      3
+                    </div>
+                    <div>
+                      <h4 className="text-xl font-display font-extrabold text-gray-900 tracking-tight">
+                        Match & Chat
+                      </h4>
+                      <p className="text-gray-500 mt-2 leading-relaxed font-body font-medium">
+                        Find matches nearby. Chat anonymously to see if there is
+                        a spark before revealing who you are.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-10">
+                  <button
+                    onClick={() => navigate("/auth")}
+                    className="text-primary font-display font-extrabold hover:text-primary-dark inline-flex items-center gap-1 group tracking-tight"
+                  >
+                    Start your journey
+                    <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">
+                      arrow_forward
+                    </span>
+                  </button>
+                </div>
+              </div>
+              <div className="lg:w-1/2 relative fade-in-up delay-200">
+                <div className="relative z-10 bg-white p-6 rounded-3xl shadow-2xl border border-gray-100 max-w-sm mx-auto transform rotate-[-2deg] hover:rotate-0 transition-transform duration-500">
+                  <div className="flex items-center justify-between mb-6">
+                    <span className="material-symbols-outlined text-gray-400">
+                      menu
+                    </span>
+                    <span className="font-pacifico text-lg tracking-tight">
+                      Snugglr
+                    </span>
+                    <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                      <img
+                        className="w-full h-full object-cover"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuAU-Eg2RAKTKdNmiCNzAi737Bvn0bDn1dXQAU3tb1-rp3Kx5I2jo768H7oYyysxPOFIg3dSmc5mHeafwii72nlr-dbA1Jvxak-cgvjgtLuiQDJoIVeKHa4yrqzVCXQGiL89OMRFEHOvvz5k2DXHWaJcxQIehhBDITdpa20i6C7g5iTslOt6Rfut6U9nNyLl7h01fvttmZu_Cw0fSHyE7d9aOZ5gzPelYSA4AXlyDKfrvy2RvIEBXdhXCEfnyGjUvSOr3tZt8fd5Gr-W"
+                        alt="Profile"
+                      />
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 rounded-2xl p-4 mb-4 aspect-[4/5] relative overflow-hidden flex items-end">
+                    <div className="absolute inset-0 bg-gray-200">
+                      <img
+                        className="w-full h-full object-cover opacity-80 mix-blend-overlay grayscale"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkMDS5Evx1RgqXhP_CJVz1cD1w--n4xyWl1Aud4J0YNfYD29CVbEoUsRYof3AI5ZsYjvKPB0efnaRV4tJ83Z1p5rO0qNMuUEVVZuCckAzVxl51NZA9dOPpu8V4qJe1s1CFEMqBfWPZFdknY6nagLq2_D3dGof1xTxLi7_jWjQtjsDjAu0cc64Q94bcr2jh6ydJbluau1IkADeQjQbkWRBTueB-R0PtEf5dvYzrk5zuQxnOtul1lFs77QVWoiQ5mUmN5rL5wg4OIQEq"
+                        alt="Match"
+                      />
+                    </div>
+                    <div className="relative z-10 w-full p-2">
+                      <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h5 className="font-display font-extrabold text-lg tracking-tight">
+                            Mystery Student
+                          </h5>
+                          <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-display font-extrabold">
+                            98% Match
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500 font-body">
+                          Junior • Art History • 0.5 miles away
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex justify-center gap-6">
+                    <button className="w-14 h-14 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+                      <span className="material-symbols-outlined text-3xl">
+                        close
+                      </span>
+                    </button>
+                    <button className="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center text-white hover:bg-primary-dark transition-colors">
+                      <span className="material-symbols-outlined text-3xl">
+                        favorite
+                      </span>
+                    </button>
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-tr from-pink-100 to-blue-50 rounded-full blur-3xl opacity-50 z-0 transform scale-110"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* The Journey Section */}
+        <section className="py-24 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="text-center mb-12 fade-in-up">
+              <h2 className="text-3xl md:text-4xl font-display font-extrabold mb-6 tracking-[-0.02em]">
+                The Journey
+              </h2>
+              <p className="text-gray-500 text-lg leading-relaxed font-body font-medium">
+                From mysterious stranger to campus crush in five simple steps.
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+              {/* Step 1 */}
+              <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-bold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
+                  1
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center mb-6 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform">
+                  <span className="material-symbols-outlined">school</span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">
+                  Sign Up
+                </h3>
+                <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                  Use your university email to verify your student status.
+                </p>
+              </div>
+
+              {/* Step 2 */}
+              <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
+                  2
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
+                  <span className="material-symbols-outlined">edit_note</span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">
+                  Build Profile
+                </h3>
+                <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                  Share your vibes and interests. Keep the mystery alive.
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
+                  3
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
+                  <span className="material-symbols-outlined">
+                    travel_explore
+                  </span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">
+                  Discover
+                </h3>
+                <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                  Find matches based on personality compatibility.
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
+                  4
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
+                  <span className="material-symbols-outlined">
+                    chat_bubble_outline
+                  </span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">
+                  Connect
+                </h3>
+                <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                  Chat privately and securely without revealing photos yet.
+                </p>
+              </div>
+
+              {/* Step 5 */}
+              <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
+                  5
+                </div>
+                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-accent flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors border border-accent/20">
+                  <span className="material-symbols-outlined">favorite</span>
+                </div>
+                <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">
+                  Confess
+                </h3>
+                <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                  Share your identity when you're ready to meet up.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="py-12 bg-white">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="relative rounded-[2.5rem] overflow-hidden bg-black aspect-[21/9] flex items-center justify-center group">
+              <div className="absolute inset-0 opacity-60">
+                <img
+                  alt="Campus Life"
+                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkMDS5Evx1RgqXhP_CJVz1cD1w--n4xyWl1Aud4J0YNfYD29CVbEoUsRYof3AI5ZsYjvKPB0efnaRV4tJ83Z1p5rO0qNMuUEVVZuCckAzVxl51NZA9dOPpu8V4qJe1s1CFEMqBfWPZFdknY6nagLq2_D3dGof1xTxLi7_jWjQtjsDjAu0cc64Q94bcr2jh6ydJbluau1IkADeQjQbkWRBTueB-R0PtEf5dvYzrk5zuQxnOtul1lFs77QVWoiQ5mUmN5rL5wg4OIQEq"
+                />
+              </div>
+              <div className="relative z-10 text-center max-w-xl px-6">
+                <h2 className="text-white text-3xl md:text-5xl font-display font-extrabold mb-6 tracking-[-0.02em]">
+                  Your Campus. Your Rules.
+                </h2>
+                <p className="text-gray-300 mb-8 text-lg leading-relaxed font-body font-medium">
+                  Join thousands of students finding meaningful connections
+                  every day.
+                </p>
+                <button
+                  onClick={() => navigate("/auth")}
+                  className="bg-white text-black px-8 py-3 rounded-full font-display font-extrabold hover:bg-gray-100 transition-colors tracking-tight"
+                >
+                  Get Started
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section className="py-24 bg-white" id="features">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
+              <div className="flex flex-col gap-4 group">
+                <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <span className="material-symbols-outlined text-2xl">
+                    verified_user
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-extrabold mb-2 tracking-tight">
+                    Verified Community
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                    Exclusive access ensures you're only talking to real
+                    students on your campus.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4 group">
+                <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <span className="material-symbols-outlined text-2xl">
+                    visibility_off
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-extrabold mb-2 tracking-tight">
+                    Complete Anonymity
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                    Explore connections without prejudice. Your identity is
+                    yours to keep.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4 group">
+                <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <span className="material-symbols-outlined text-2xl">
+                    favorite_border
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-extrabold mb-2 tracking-tight">
+                    Meaningful Connections
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                    Our algorithm prioritizes personality and interests over
+                    profile pictures.
+                  </p>
+                </div>
+              </div>
+              <div className="flex flex-col gap-4 group">
+                <div className="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center text-black group-hover:bg-black group-hover:text-white transition-colors duration-300">
+                  <span className="material-symbols-outlined text-2xl">
+                    lock
+                  </span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-display font-extrabold mb-2 tracking-tight">
+                    Secure & Private
+                  </h3>
+                  <p className="text-sm text-gray-500 leading-[1.6] font-body font-medium">
+                    End-to-end encryption keeps your conversations and data safe
+                    at all times.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="bg-black text-white pt-20 pb-10 px-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between gap-16 mb-16 border-b border-gray-800 pb-16">
+              <div className="max-w-sm">
+                <div className="flex items-center gap-2 mb-6">
+                  <span className="material-symbols-outlined text-white text-2xl">
+                    favorite
+                  </span>
+                  <span className="text-2xl font-pacifico tracking-[-0.02em]">
+                    Snugglr
+                  </span>
+                </div>
+                <p className="text-gray-400 text-sm leading-[1.7] mb-8 font-body font-medium">
+                  Reimagining college dating with mystery, authenticity, and
+                  safety at the core.
+                </p>
+                <div className="flex gap-4">
+                  <a
+                    className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                    href="#"
+                  >
+                    <span className="text-xs font-display font-bold"></span>
+                  </a>
+                  <a
+                    className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                    href="#"
+                  >
+                    <span className="text-xs font-display font-bold">X</span>
+                  </a>
+                  <a
+                    className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
+                    href="#"
+                  >
+                    <span className="text-xs font-display font-bold">TT</span>
+                  </a>
+                </div>
+              </div>
+              <div className="flex gap-16 flex-wrap">
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-display font-bold text-xs uppercase tracking-widest text-gray-500">
+                    Platform
+                  </h4>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#how-it-works"
+                  >
+                    How it Works
+                  </a>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#safety"
+                  >
+                    Safety
+                  </a>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    Download
+                  </a>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-display font-bold text-xs uppercase tracking-widest text-gray-500">
+                    Company
+                  </h4>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    About
+                  </a>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    Careers
+                  </a>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    Press
+                  </a>
+                </div>
+                <div className="flex flex-col gap-4">
+                  <h4 className="font-display font-bold text-xs uppercase tracking-widest text-gray-500">
+                    Legal
+                  </h4>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    Privacy Policy
+                  </a>
+                  <a
+                    className="text-sm text-gray-300 hover:text-white transition-colors font-body"
+                    href="#"
+                  >
+                    Terms of Service
+                  </a>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-600 font-body">
+              <p>© 2024 Snugglr Inc. All rights reserved.</p>
+              <div className="flex items-center gap-6">
+                <span>Made with ♥ on Campus</span>
+              </div>
+            </div>
+          </div>
         </footer>
-      </div>
+      </main>
     </div>
   );
 }

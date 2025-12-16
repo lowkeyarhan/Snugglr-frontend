@@ -230,7 +230,7 @@ export const likeComment = async (
 }> => {
   try {
     const response = await api.post(
-      `/api/confession/${commentId}/like`,
+      `/api/confession/comment/${commentId}/like`,
       {},
       {
         headers: {

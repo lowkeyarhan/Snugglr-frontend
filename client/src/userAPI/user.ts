@@ -7,7 +7,6 @@ export type InstitutionRef =
       name?: string;
     };
 
-// Aligned to `server/models/profile/User.ts` (+ `institution` can be populated)
 export type MyProfile = {
   _id: string;
   name?: string;
@@ -37,7 +36,7 @@ export type MyProfile = {
   updatedAt?: string;
 };
 
-// update user profile
+// update the user profile
 export const updateUserProfile = async (
   data: {
     name?: string;
@@ -88,7 +87,7 @@ export const updateUserProfile = async (
   }
 };
 
-// get current user
+// get the current user profile
 export const getMyProfile = async (
   token: string
 ): Promise<{

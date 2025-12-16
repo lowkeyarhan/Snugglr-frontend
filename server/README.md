@@ -450,7 +450,7 @@ Reply to a comment.
 
 ---
 
-#### `POST /confession/:commentId/like`
+#### `POST /confession/comment/:commentId/like`
 
 Like or unlike a comment.
 
