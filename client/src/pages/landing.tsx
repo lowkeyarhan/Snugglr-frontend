@@ -1,7 +1,34 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const ENTER_AT = 14;
+    const EXIT_AT = 6;
+
+    let rafId: number | null = null;
+
+    const update = () => {
+      rafId = null;
+      const y = window.scrollY;
+      setIsScrolled((prev) => (prev ? y > EXIT_AT : y > ENTER_AT));
+    };
+
+    const onScroll = () => {
+      if (rafId != null) return;
+      rafId = window.requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (rafId != null) window.cancelAnimationFrame(rafId);
+    };
+  }, []);
 
   return (
     <div
@@ -12,52 +39,64 @@ export default function Landing() {
       <div className="fixed inset-0 z-0 bg-doodle-subtle pointer-events-none"></div>
 
       {/* Header */}
-      <header className="fixed w-full top-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-3xl">
-              favorite
-            </span>
-            <span
-              className="text-2xl font-extrabold tracking-[-0.02em]"
-              style={{ fontFamily: "'Pacifico', cursive" }}
-            >
-              Snugglr
-            </span>
-          </div>
-          <nav className="hidden md:flex gap-8">
-            <a
-              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
-              href="#how-it-works"
-            >
-              How it Works
-            </a>
-            <a
-              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
-              href="#safety"
-            >
-              Safety
-            </a>
-            <a
-              className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
-              href="#community"
-            >
-              Community
-            </a>
-          </nav>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/auth")}
-              className="text-sm font-display font-extrabold text-gray-900 hover:text-primary transition-colors hidden sm:block tracking-tight"
-            >
-              Log in
-            </button>
-            <button
-              onClick={() => navigate("/auth")}
-              className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-full text-sm font-display font-extrabold transition-all transform hover:scale-105 tracking-tight"
-            >
-              Start Matching
-            </button>
+      <header
+        className={[
+          "fixed inset-x-0 top-0 z-50 flex justify-center pointer-events-none transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+          isScrolled ? "pt-3" : "pt-0",
+        ].join(" ")}
+      >
+        <div
+          className={[
+            "pointer-events-auto transform-gpu will-change-[transform,width,height] transition-[width,height,transform,background-color,backdrop-filter,border-radius,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]",
+            "bg-white/50 backdrop-blur-md",
+            isScrolled
+              ? "h-14 w-[min(100%-2rem,56rem)] rounded-full shadow-xl shadow-black/10 pl-6 pr-2 border border-white/60"
+              : "h-20 w-full rounded-none shadow-none border border-transparent",
+          ].join(" ")}
+        >
+          <div className="h-full flex items-center justify-between max-w-7xl mx-auto w-full">
+            <div className="flex items-center gap-2">
+              <span
+                className="text-2xl font-extrabold tracking-[-0.02em]"
+                style={{ fontFamily: "'Pacifico', cursive" }}
+              >
+                Snugglr
+              </span>
+            </div>
+            <nav className="hidden md:flex gap-8">
+              <a
+                className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+                href="#how-it-works"
+              >
+                How it Works
+              </a>
+              <a
+                className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+                href="#safety"
+              >
+                Safety
+              </a>
+              <a
+                className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+                href="#community"
+              >
+                Community
+              </a>
+            </nav>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate("/auth")}
+                className="text-sm font-display font-extrabold text-gray-900 hover:text-primary transition-colors hidden sm:block tracking-tight"
+              >
+                Log in
+              </button>
+              <button
+                onClick={() => navigate("/auth")}
+                className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-full text-sm font-display font-extrabold transition-all transform hover:scale-105 tracking-tight"
+              >
+                Start Matching
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -411,7 +450,7 @@ export default function Landing() {
                 <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
                   5
                 </div>
-                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-accent flex items-center justify-center mb-6 group-hover:bg-accent group-hover:text-white transition-colors border border-accent/20">
+                <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors border border-accent/20">
                   <span className="material-symbols-outlined">favorite</span>
                 </div>
                 <h3 className="font-display font-extrabold text-lg mb-2 tracking-tight">

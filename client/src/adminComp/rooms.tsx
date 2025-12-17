@@ -59,13 +59,13 @@ export default function Rooms() {
       }
 
       const response = await getAllChats(token);
-      const chats = response.data.chats;
+      const chats: Chat[] = (response?.data?.chats ?? []) as Chat[];
       setAllRooms(chats);
 
       // Extract unique communities
       const uniqueCommunities = Array.from(
-        new Set(chats.map((chat) => chat.community))
-      ).sort();
+        new Set(chats.map((chat: Chat) => chat.community))
+      ).sort() as string[];
       setCommunities(uniqueCommunities);
     } catch (err: any) {
       setError(err.message || "Failed to fetch chat rooms");

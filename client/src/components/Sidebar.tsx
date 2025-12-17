@@ -64,8 +64,8 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
   const allNavItems: NavItem[] = [
     { icon: "home", label: "Home", path: "/home", filled: true },
     { icon: "favorite", label: "Matches", path: "/matches" },
-    { icon: "forum", label: "Confessions", path: "/confessions" },
-    { icon: "mail", label: "Chat", path: "/chat", badge: 3 },
+    { icon: "post", label: "Confessions", path: "/confessions" },
+    { icon: "message", label: "Chat", path: "/chat", badge: 3 },
     { icon: "person", label: "Profile", path: "/profile" },
     { icon: "settings", label: "Settings", path: "/settings" },
     { icon: "help", label: "Help", path: "/help" },
@@ -126,28 +126,28 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
               onClick={() => navigate(item.path)}
               title={collapsed ? item.label : undefined}
             >
-              <span
-                className={`material-symbols-outlined text-[28px] group-hover:scale-105 transition-transform ${
-                  isActive || item.filled ? "fill-current" : ""
-                }`}
-              >
-                {item.icon}
+              <span className="relative">
+                <span
+                  className={`material-symbols-outlined text-[28px] group-hover:scale-105 transition-transform ${
+                    isActive || item.filled ? "fill-current" : ""
+                  }`}
+                >
+                  {item.icon}
+                </span>
+                {item.badge && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold px-1.5 min-w-[18px] h-[18px] rounded-full flex items-center justify-center leading-none">
+                    {item.badge}
+                  </span>
+                )}
               </span>
               {!collapsed && (
-                <>
-                  <span
-                    className={`text-sm ${
-                      isActive ? "font-bold" : "font-medium"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
-                  {item.badge && (
-                    <span className="ml-auto bg-primary text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                </>
+                <span
+                  className={`text-sm ${
+                    isActive ? "font-bold" : "font-medium"
+                  }`}
+                >
+                  {item.label}
+                </span>
               )}
             </button>
           );
@@ -167,23 +167,49 @@ export default function Sidebar({ collapsed = false }: SidebarProps) {
 
           {/* User Profile */}
           <div
-            className="flex items-center gap-3 px-2 py-2 cursor-pointer rounded-xl hover:bg-gray-50 dark:hover:bg-white/5"
+            className="flex items-center gap-4 px-4 py-3 cursor-pointer rounded-full select-none
+              bg-[#f1f3f8] dark:bg-[#1c1d23]
+              border border-black/5 dark:border-white/5
+              shadow-[10px_10px_20px_rgba(0,0,0,0.08),_-10px_-10px_20px_rgba(255,255,255,0.9)]
+              dark:shadow-[10px_10px_20px_rgba(0,0,0,0.55),_-10px_-10px_20px_rgba(255,255,255,0.04)]
+              hover:shadow-[12px_12px_22px_rgba(0,0,0,0.10),_-12px_-12px_22px_rgba(255,255,255,0.95)]
+              dark:hover:shadow-[12px_12px_22px_rgba(0,0,0,0.60),_-12px_-12px_22px_rgba(255,255,255,0.05)]
+              transition-shadow duration-300"
             onClick={() => navigate("/profile")}
           >
             <div
-              className="h-10 w-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-700"
-              style={{
-                backgroundImage: `url("${userProfileImage}")`,
-              }}
-            />
+              className="shrink-0 p-[3px] rounded-full
+                bg-[#f1f3f8] dark:bg-[#1c1d23]
+                shadow-[inset_2px_2px_5px_rgba(0,0,0,0.08),inset_-2px_-2px_5px_rgba(255,255,255,0.9)]
+                dark:shadow-[inset_2px_2px_6px_rgba(0,0,0,0.65),inset_-2px_-2px_6px_rgba(255,255,255,0.04)]"
+            >
+              <div
+                className="h-11 w-11 rounded-full bg-cover bg-center
+                  border border-black/5 dark:border-white/5
+                  shadow-[6px_6px_12px_rgba(0,0,0,0.12),_-6px_-6px_12px_rgba(255,255,255,0.9)]
+                  dark:shadow-[6px_6px_12px_rgba(0,0,0,0.6),_-6px_-6px_12px_rgba(255,255,255,0.04)]"
+                style={{
+                  backgroundImage: `url("${userProfileImage}")`,
+                }}
+              />
+            </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold text-gray-900 dark:text-white">
                 Alex Doe
               </span>
               <span className="text-xs text-gray-500">@alex_ui</span>
             </div>
-            <span className="material-symbols-outlined ml-auto text-gray-400 text-sm">
-              more_horiz
+            <span
+              className="ml-auto inline-flex items-center justify-center h-9 w-9 rounded-full
+                bg-[#f1f3f8] dark:bg-[#1c1d23]
+                border border-black/5 dark:border-white/5
+                shadow-[6px_6px_12px_rgba(0,0,0,0.08),_-6px_-6px_12px_rgba(255,255,255,0.9)]
+                dark:shadow-[6px_6px_12px_rgba(0,0,0,0.55),_-6px_-6px_12px_rgba(255,255,255,0.04)]"
+              aria-hidden="true"
+            >
+              <span className="material-symbols-outlined text-gray-500 dark:text-gray-400 text-base">
+                more_horiz
+              </span>
             </span>
           </div>
         </div>

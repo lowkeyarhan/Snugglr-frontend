@@ -1,5 +1,37 @@
 import { api } from "./http";
 
+export type MatchPoolEntry = {
+  _id: string;
+  user: string;
+  institution: string;
+  mood: string;
+  description: string | null;
+  expiresAt: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const getMyMatchPool = async (
+  token: string
+): Promise<{ entry: MatchPoolEntry | null }> => {
+  try {
+    const response = await api.get("/api/match/pool/me", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to fetch match pool status"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
 // join the match pool to find potential matches
 export const joinMatchPool = async (
   mood: string,
@@ -23,6 +55,33 @@ export const joinMatchPool = async (
     if (error.response) {
       throw new Error(
         error.response.data.message || "Failed to join match pool"
+      );
+    } else if (error.request) {
+      throw new Error("Cannot connect to server. Please try again.");
+    } else {
+      throw new Error("An unexpected error occurred");
+    }
+  }
+};
+
+export const leaveMatchPool = async (
+  token: string
+): Promise<{ message: string }> => {
+  try {
+    const response = await api.post(
+      "/api/match/pool/leave",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (error: any) {
+    if (error.response) {
+      throw new Error(
+        error.response.data.message || "Failed to leave match pool"
       );
     } else if (error.request) {
       throw new Error("Cannot connect to server. Please try again.");

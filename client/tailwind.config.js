@@ -19,7 +19,6 @@ export default {
         "surface-dark": "#2d2438",
         "bubble-light": "#ffffff",
         "bubble-dark": "#2a2438",
-        "bubble-gray": "#f3f4f6",
         "text-light": "#1e293b",
         "text-dark": "#e2e8f0",
         "muted-light": "#64748b",
@@ -31,8 +30,6 @@ export default {
         display: ["Manrope", "sans-serif"],
         body: ["Noto Sans", "sans-serif"],
         pacifico: ["Pacifico", "cursive"],
-        serif: ["Cinzel", "serif"],
-        sans: ["Inter", "sans-serif"],
       },
       backgroundImage: {
         "doodle-subtle":
@@ -53,7 +50,6 @@ export default {
         soft: "0 10px 40px -10px rgba(108, 43, 238, 0.15)",
         lifted:
           "0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.07)",
-        bubble: "0 10px 40px -10px rgba(0, 0, 0, 0.1)",
       },
       keyframes: {
         float: {
@@ -77,9 +73,7 @@ export default {
       },
       animation: {
         float: "float 8s ease-in-out infinite",
-        "float-delayed": "float 8s ease-in-out 4s infinite",
         fadeIn: "fadeIn 0.5s ease-out forwards",
-        "pulse-slow": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

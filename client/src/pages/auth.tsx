@@ -125,7 +125,10 @@ export default function Auth() {
                   <div className="h-full w-full bg-slate-100 dark:bg-slate-900 overflow-y-auto scrollbar-hide">
                     {/* Header */}
                     <div className="p-4 bg-white dark:bg-slate-800/80 backdrop-blur-sm sticky top-0 z-10 flex justify-between items-center border-b border-slate-200 dark:border-slate-700">
-                      <h1 className="text-xl font-bold text-primary">
+                      <h1
+                        className="text-2xl font-bold text-black"
+                        style={{ fontFamily: "'Pacifico', cursive" }}
+                      >
                         Snugglr
                       </h1>
                       <div className="flex items-center space-x-3">
@@ -147,9 +150,9 @@ export default function Auth() {
                       </div>
                     </div>
 
-                    <div className="p-4 space-y-6">
+                    <div className="p-2 space-y-6">
                       {/* Find a Match Card */}
-                      <div className="bg-gradient-to-br from-primary to-primary-light rounded-xl p-4 text-white shadow-lg">
+                      <div className="bg-gradient-to-br from-black to-gray-800 rounded-[20px] p-4 text-white shadow-lg">
                         <h2 className="font-bold text-lg">Find a Match!</h2>
                         <p className="text-sm opacity-80 mb-3">
                           Guess who's behind the profile.
@@ -162,9 +165,6 @@ export default function Auth() {
                                 className="w-16 h-16 rounded-full object-cover border-2 border-white shadow-md"
                                 src={`https://lh3.googleusercontent.com/aida-public/AB6AXuDWNl3hI9dbRjkXG2aBSaXOHO9v00zKPIFk6P9wU_sXMvWCL32-Z0kJz5S1b9mi_VoiXqvAdVL7qTu0Z7z54AX2QBDG-esHzu-dOM6eqXmBWq3dKageotiyTs1lcCTFfrbkvdAvL86s1mFN--Wz0z2pKU_qMLm_SvlcM1G-R8ln9Tjlzwkrpjk_Hb8WJNSCqxjCl-ory_QCeFp7r6eDAUkXGzrOznYYi99k8I50ox1bhfKaAz-8t-aJ6lMk4bkUVhOC0Yl6XgmGuZMb`}
                               />
-                              <div className="absolute inset-0 bg-primary/30 rounded-full flex items-center justify-center">
-                                <span className="text-3xl font-bold">?</span>
-                              </div>
                             </div>
                           ))}
                         </div>
@@ -196,11 +196,11 @@ export default function Auth() {
                           ].map((item, i) => (
                             <div
                               key={i}
-                              className="flex-shrink-0 w-20 text-center"
+                              className="flex-shrink-0 w-16 text-center"
                             >
                               <img
                                 alt={`Suggested match ${i + 1}`}
-                                className="w-20 h-20 rounded-full object-cover shadow-md"
+                                className="w-16 h-16 rounded-full object-cover shadow-md"
                                 src={item.img}
                               />
                               <p className="text-xs mt-1 font-semibold text-slate-700 dark:text-slate-300">
@@ -212,7 +212,7 @@ export default function Auth() {
                       </div>
 
                       {/* Social Post */}
-                      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-3 space-y-3">
+                      <div className="bg-white dark:bg-slate-800 rounded-[20px] shadow-sm p-3 space-y-3">
                         <div className="flex items-center space-x-3">
                           <img
                             alt="User avatar"
@@ -231,7 +231,7 @@ export default function Auth() {
                         <p className="text-sm text-slate-700 dark:text-slate-300">
                           Anyone else feel like this semester is flying by? 😅
                         </p>
-                        <div className="flex justify-between text-slate-500 dark:text-slate-400">
+                        <div className="flex justify-start gap-2 text-slate-500 dark:text-slate-400">
                           <button className="flex items-center space-x-1 text-xs">
                             <span className="material-symbols-outlined text-base">
                               favorite_border
@@ -246,7 +246,7 @@ export default function Auth() {
                           </button>
                           <button className="flex items-center space-x-1 text-xs">
                             <span className="material-symbols-outlined text-base">
-                              repeat
+                              share
                             </span>
                             <span>1</span>
                           </button>
@@ -290,11 +290,11 @@ export default function Auth() {
                               <p className="font-bold text-sm text-slate-800 dark:text-slate-200">
                                 CS Student
                               </p>
-                              <p className="text-xs text-primary font-semibold truncate">
+                              <p className="text-xs text-green-500 font-semibold truncate">
                                 Typing...
                               </p>
                             </div>
-                            <span className="w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+                            <span className="w-5 h-5 bg-green-500 text-white text-xs rounded-full flex items-center justify-center">
                               2
                             </span>
                           </div>
@@ -343,8 +343,8 @@ export default function Auth() {
                     }}
                     className={`flex-1 py-3 text-center font-bold transition-colors ${
                       isSignUp
-                        ? "text-primary border-b-2 border-primary"
-                        : "text-muted-light dark:text-muted-dark hover:text-primary"
+                        ? "text-black border-b-2 border-black"
+                        : "text-muted-light dark:text-muted-dark hover:text-black"
                     }`}
                   >
                     Sign Up
@@ -357,8 +357,8 @@ export default function Auth() {
                     }}
                     className={`flex-1 py-3 text-center font-medium transition-colors ${
                       !isSignUp
-                        ? "text-primary border-b-2 border-primary"
-                        : "text-muted-light dark:text-muted-dark hover:text-primary"
+                        ? "text-black border-b-2 border-black"
+                        : "text-muted-light dark:text-muted-dark hover:text-black"
                     }`}
                   >
                     Log In
@@ -384,8 +384,8 @@ export default function Auth() {
                         }}
                         className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                           loginMethod === "email"
-                            ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
-                            : "text-muted-light dark:text-muted-dark hover:text-primary"
+                            ? "bg-black dark:bg-gray-700 text-white shadow-sm"
+                            : "text-muted-light dark:text-muted-dark"
                         }`}
                       >
                         Email
@@ -398,8 +398,8 @@ export default function Auth() {
                         }}
                         className={`flex-1 py-2 px-4 rounded-lg text-sm font-medium transition-all ${
                           loginMethod === "phone"
-                            ? "bg-white dark:bg-gray-700 text-primary shadow-sm"
-                            : "text-muted-light dark:text-muted-dark hover:text-primary"
+                            ? "bg-black dark:bg-gray-700 text-white shadow-sm"
+                            : "text-muted-light dark:text-muted-dark "
                         }`}
                       >
                         Phone Number
@@ -435,7 +435,7 @@ export default function Auth() {
                       </label>
                       <input
                         autoComplete="email"
-                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
+                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-black focus:border-none h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
                         id="college-email"
                         name="email"
                         placeholder="your.name@college.edu"
@@ -460,7 +460,7 @@ export default function Auth() {
                       </label>
                       <input
                         autoComplete="tel"
-                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
+                        className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-black focus:border-none h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
                         id="phone-number"
                         name="phoneNumber"
                         placeholder="+1 (555) 123-4567"
@@ -482,7 +482,7 @@ export default function Auth() {
                     </label>
                     <input
                       autoComplete="current-password"
-                      className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
+                      className="form-input block w-full appearance-none rounded-lg border border-gray-300 dark:border-gray-600 bg-background-light dark:bg-background-dark focus:z-10 focus:outline-none focus:ring-2 focus:ring-black focus:border-none h-14 pl-4 pr-12 text-base text-text-light dark:text-text-dark placeholder-muted-light dark:placeholder-muted-dark"
                       id="password"
                       name="password"
                       placeholder={
@@ -504,7 +504,7 @@ export default function Auth() {
                       <div className="text-sm">
                         <button
                           type="button"
-                          className="font-medium text-primary hover:text-primary-light dark:hover:text-primary-light cursor-pointer"
+                          className="font-medium text-red-500 hover:text-gray-800 dark:hover:text-gray-200 cursor-pointer"
                           onClick={(e) => e.preventDefault()}
                         >
                           Forgot your password?
@@ -516,7 +516,7 @@ export default function Auth() {
                   {/* Submit Button */}
                   <div>
                     <button
-                      className="group relative flex w-full justify-center items-center gap-2 rounded-lg border border-transparent bg-primary py-3 px-4 text-base font-bold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-all duration-300 ease-in-out shadow-lg hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="group relative flex w-full justify-center items-center gap-2 rounded-lg border border-transparent bg-gradient-to-r from-black to-gray-800 py-3 px-4 text-base font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background-light dark:focus:ring-offset-background-dark transition-all duration-300 ease-in-out shadow-lg hover:shadow-glow disabled:opacity-50 disabled:cursor-not-allowed"
                       type="submit"
                       disabled={loading}
                     >
