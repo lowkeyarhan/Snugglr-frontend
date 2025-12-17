@@ -51,9 +51,9 @@ export const updateUserProfile = async (
     musicPreferences?: string;
     favoriteShows?: string;
     memeVibe?: string;
-    favArtists?: string;
-    favMovies?: string;
-    favAlbums?: string;
+    favArtists?: string[];
+    favMovies?: string[];
+    favAlbums?: string[];
     favSpotOnCampus?: string;
     loveLanguage?: string;
     quirkyFacts?: string;

@@ -7,7 +7,7 @@ import { generateUniqueAnonymousUsername } from "../utils/usernameGenerator";
 // register a new user
 export const registerUser = async (req, res) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password } = req.body;
 
     // check if email and password are provided
     if (!email || !password) {
@@ -47,17 +47,8 @@ export const registerUser = async (req, res) => {
     // generate a unique anonymous username
     const username = await generateUniqueAnonymousUsername(UserModel);
 
-    // `name` is required by the User schema, but the client may only provide email+password at signup.
-    // Use a safe placeholder; onboarding/profile update will overwrite later.
-    const safeName =
-      typeof name === "string" && name.trim().length > 0
-        ? name.trim()
-        : "Anonymous";
-
-    // create new user with only email and password
-    // other details will be filled during onboarding
+    // create new user
     const newUser = await UserModel.create({
-      name: safeName,
       username,
       email: normalizedEmail,
       password: hashedPassword,
@@ -159,7 +150,6 @@ export const loginUser = async (req, res) => {
       data: {
         user: {
           id: user._id,
-          name: user.name,
           username: user.username,
           email: user.email,
           phoneNumber: user.phoneNumber,

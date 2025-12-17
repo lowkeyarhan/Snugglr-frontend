@@ -178,8 +178,8 @@ VITE_API_URL=http://localhost:8081
 
 ```typescript
 useEffect(() => {
-  socket.on('new_message', handleNewMessage);
-  return () => socket.off('new_message');
+  socket.on("new_message", handleNewMessage);
+  return () => socket.off("new_message");
 }, []);
 ```
 

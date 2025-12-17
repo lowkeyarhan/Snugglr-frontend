@@ -82,7 +82,7 @@ export default function NotificationsPane() {
       {/* Scrollable Content */}
       <div className="flex-1 overflow-y-auto">
         {/* Match Card */}
-        <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+        <div className="p-4 border-b border-gray-100 dark:border-gray-800">
           <div className="relative rounded-3xl p-4 overflow-hidden bg-[#f4f5f7] dark:bg-[#14161a] border border-black/5 dark:border-white/5 shadow-[10px_10px_22px_rgba(0,0,0,0.10),_-10px_-10px_22px_rgba(255,255,255,0.95)] dark:shadow-[10px_10px_22px_rgba(0,0,0,0.65),_-10px_-10px_22px_rgba(255,255,255,0.04)]">
             {/* subtle top highlight for "3D" */}
             <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/80 to-transparent dark:from-white/5" />
@@ -127,7 +127,7 @@ export default function NotificationsPane() {
         </div>
 
         {/* Trending Section */}
-        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800">
+        <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-gray-400 uppercase tracking-wider">
               Trending
@@ -156,7 +156,7 @@ export default function NotificationsPane() {
         </div>
 
         {/* Notifications List */}
-        <div className="px-6 py-4">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs text-gray-400 uppercase tracking-wider">
               Recent
@@ -166,7 +166,7 @@ export default function NotificationsPane() {
             {notifications.map((notification) => (
               <div
                 key={notification.id}
-                className="flex items-start gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                className="flex items-center gap-3 p-3 rounded-xl bg-gray-500/15 dark:hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <div
                   className={`w-9 h-9 rounded-full ${notification.iconBg} flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[6px_6px_14px_rgba(0,0,0,0.18)]`}

@@ -7,7 +7,7 @@ const router = Router();
  * @swagger
  * /auth/register:
  *   post:
- *     summary: Register a new user
+ *     summary: Register a new user (email + password only)
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -19,11 +19,6 @@ const router = Router();
  *               - email
  *               - password
  *             properties:
- *               name:
- *                 type: string
- *                 minLength: 3
- *                 maxLength: 30
- *                 example: John Doe
  *               email:
  *                 type: string
  *                 format: email
@@ -34,17 +29,6 @@ const router = Router();
  *                 format: password
  *                 minLength: 8
  *                 example: SecurePass123
- *               gender:
- *                 type: string
- *                 enum: [male, female, non-binary, other, prefer-not-to-say]
- *                 example: male
- *               birthday:
- *                 type: string
- *                 format: date
- *                 example: 2000-01-15
- *               pronouns:
- *                 type: string
- *                 example: he/him
  *     responses:
  *       201:
  *         description: User registered successfully
@@ -59,28 +43,29 @@ const router = Router();
  *                 message:
  *                   type: string
  *                   example: User created successfully
- *                 user:
+ *                 data:
  *                   type: object
  *                   properties:
- *                     _id:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         username:
+ *                           type: string
+ *                           description: Auto-generated anonymous username
+ *                         email:
+ *                           type: string
+ *                         collegeName:
+ *                           type: string
+ *                         institution:
+ *                           type: string
+ *                         role:
+ *                           type: string
+ *                           example: user
+ *                     token:
  *                       type: string
- *                     name:
- *                       type: string
- *                     username:
- *                       type: string
- *                       description: Auto-generated anonymous username
- *                     email:
- *                       type: string
- *                     collegeName:
- *                       type: string
- *                     institution:
- *                       type: string
- *                     role:
- *                       type: string
- *                       example: user
- *                 token:
- *                   type: string
- *                   description: JWT authentication token
+ *                       description: JWT authentication token
  *       400:
  *         description: Bad request - validation error or email domain not authorized
  *         content:

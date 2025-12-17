@@ -5,7 +5,6 @@ const UserSchema = new mongoose.Schema(
     // user authentication fields
     name: {
       type: String,
-      required: [true, "Name is required"],
       trim: true,
       minlength: [3, "Name must be at least 3 characters"],
       maxlength: [30, "Name must be less than 30 characters"],

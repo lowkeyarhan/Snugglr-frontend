@@ -59,7 +59,7 @@ export default function NotFound() {
               {/* Dynamic Button */}
               <button
                 onClick={handleButtonClick}
-                className="flex min-w-[120px] max-w-xs cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-[#D90368] text-white text-base font-bold leading-normal tracking-wide shadow-lg transition-transform duration-200"
+                className="flex min-w-[120px] max-w-xs cursor-pointer items-center justify-center overflow-hidden rounded-full h-12 px-6 bg-black text-white text-base font-bold shadow-black/30 leading-normal tracking-wide shadow-lg transition-transform duration-200"
               >
                 <span className="truncate">Go back</span>
               </button>

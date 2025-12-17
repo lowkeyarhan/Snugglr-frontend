@@ -40,7 +40,6 @@ const ALLOWED_FIELDS = [
   "birthday",
   "pronouns",
   "gender",
-  "hint",
   "community",
   "interests",
   "musicPreferences",
