@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllComments, deleteCommentAdmin } from "../adminAPI/api";
+import { getAllComments, deleteCommentAdmin } from "../../api/admin/api";
 
 interface AdminReply {
   _id: string;

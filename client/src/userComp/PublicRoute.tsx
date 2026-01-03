@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import type { ReactElement } from "react";
-import { isAuthenticated } from "../userAPI/auth";
+import { isAuthenticated } from "../../api/user/auth";
 
 // Public route props
 interface PublicRouteProps {

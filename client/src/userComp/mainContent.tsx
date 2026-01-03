@@ -8,12 +8,12 @@ import {
   leaveMatchPool as leaveMatchPoolApi,
   tryMatch as tryMatchApi,
   type MatchPoolEntry,
-} from "../userAPI/match";
+} from "../../api/user/match";
 import {
   createConfession,
   getConfessions,
   likeConfession,
-} from "../userAPI/confessions";
+} from "../../api/user/confessions";
 
 // --- Static Data & Constants ---
 const DUMMY_STORIES = [

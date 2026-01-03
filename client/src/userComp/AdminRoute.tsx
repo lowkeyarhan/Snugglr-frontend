@@ -1,8 +1,8 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import type { ReactElement } from "react";
-import { isAuthenticated, getAuthToken } from "../userAPI/auth";
-import { getUser } from "../userAPI/auth";
+import { isAuthenticated, getAuthToken } from "../../api/user/auth";
+import { getUser } from "../../api/user/auth";
 
 interface AdminRouteProps {
   children: ReactElement;

@@ -1,12 +1,12 @@
 import { useState, useMemo, useEffect, useRef } from "react";
-import Sidebar from "../components/Sidebar";
-import { getAuthToken } from "../userAPI/auth";
+import Sidebar from "../userComp/Sidebar";
+import { getAuthToken } from "../../api/user/auth";
 import {
   getMessages as getMessagesApi,
   sendMessage as sendMessageApi,
-} from "../userAPI/messages";
-import { getMyChats as getMyChatsApi } from "../userAPI/rooms";
-import { getMyProfile as getMyProfileApi } from "../userAPI/user";
+} from "../../api/user/messages";
+import { getMyChats as getMyChatsApi } from "../../api/user/rooms";
+import { getMyProfile as getMyProfileApi } from "../../api/user/user";
 
 // Compat wrappers: these APIs used to exist in a legacy `userAPI/api` layer.
 // The backend currently doesn't expose reveal/guess endpoints, so keep UI stable.

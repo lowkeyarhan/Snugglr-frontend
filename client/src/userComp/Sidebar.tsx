@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { getAuthToken, getUser } from "../userAPI/auth";
+import { getAuthToken, getUser } from "../../api/user/auth";
 
 const NAV_ITEMS = [
   { icon: "home", label: "Home", path: "/home", filled: true },

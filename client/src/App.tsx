@@ -7,9 +7,9 @@ import Profile from "./pages/profile";
 import Settings from "./pages/settings";
 import Admin from "./pages/admin";
 import NotFound from "./pages/notFound";
-import ProtectedRoute from "./components/ProtectedRoute";
-import AdminRoute from "./components/AdminRoute";
-import PublicRoute from "./components/PublicRoute";
+import ProtectedRoute from "./userComp/ProtectedRoute";
+import AdminRoute from "./userComp/AdminRoute";
+import PublicRoute from "./userComp/PublicRoute";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 export default function App() {

@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
-import Sidebar from "../components/Sidebar";
-import { logout } from "../userAPI/auth";
+import Sidebar from "../userComp/Sidebar";
+import { logout } from "../../api/user/auth";
 
 const getCurrentUser = async (_token: string) => {
   const userStr = localStorage.getItem("user");

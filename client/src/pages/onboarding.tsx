@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { updateUserProfile } from "../userAPI/user";
+import { updateUserProfile } from "../../api/user/user";
 import { useNavigate } from "react-router-dom";
 
 // --- Reusable UI Components ---

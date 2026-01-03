@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Message from "../models/chats/Message";
-import ChatRoom from "../models/chats/ChatRoom";
+import Message from "../../models/chats/Message";
+import ChatRoom from "../../models/chats/ChatRoom";
 
 // get messages for a chatroom
 export const getMessages = async (req: Request, res: Response) => {

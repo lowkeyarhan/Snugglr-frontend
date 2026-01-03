@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getAllConfessions, deleteConfession } from "../adminAPI/api";
+import { getAllConfessions, deleteConfession } from "../../api/admin/api";
 
 interface Confession {
   _id: string;

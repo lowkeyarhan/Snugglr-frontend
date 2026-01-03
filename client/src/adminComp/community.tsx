@@ -4,8 +4,8 @@ import {
   deleteCommunity,
   updateCommunity,
   addCommunity,
-} from "../adminAPI/api";
-import { getAuthToken } from "../userAPI/auth";
+} from "../../api/admin/api";
+import { getAuthToken } from "../../api/user/auth";
 
 interface Community {
   _id: string;

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import OpeningMoveSession from "../models/matches/OpeningMove";
-import ChatRoom from "../models/chats/ChatRoom";
+import OpeningMoveSession from "../../models/matches/OpeningMove";
+import ChatRoom from "../../models/chats/ChatRoom";
 
 // submit an opening move for a chat room
 export const submitOpeningMove = async (req: Request, res: Response) => {

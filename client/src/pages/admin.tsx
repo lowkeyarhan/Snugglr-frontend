@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { logout } from "../userAPI/auth";
+import { logout } from "../../api/user/auth";
 import Dashboard from "../adminComp/dashboard";
 import Community from "../adminComp/community";
 import Confessions from "../adminComp/confessions";

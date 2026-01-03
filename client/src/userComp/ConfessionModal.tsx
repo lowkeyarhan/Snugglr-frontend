@@ -5,8 +5,8 @@ import {
   replyToComment,
   likeComment,
   likeConfession,
-} from "../userAPI/confessions";
-import { getUser } from "../userAPI/auth";
+} from "../../api/user/confessions";
+import { getUser } from "../../api/user/auth";
 
 // --- Helpers ---
 const getToken = () => localStorage.getItem("token");

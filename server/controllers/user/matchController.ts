@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import MatchPool from "../models/matches/MatchPool";
-import Match from "../models/matches/Match";
-import ChatRoom from "../models/chats/ChatRoom";
-import OpeningMoveSession from "../models/matches/OpeningMove";
-import Notification from "../models/preferences/Notification";
+import MatchPool from "../../models/matches/MatchPool";
+import Match from "../../models/matches/Match";
+import ChatRoom from "../../models/chats/ChatRoom";
+import OpeningMoveSession from "../../models/matches/OpeningMove";
+import Notification from "../../models/preferences/Notification";
 
 // try to match a user with another user in the pool
 export const tryMatch = async (req: Request, res: Response) => {

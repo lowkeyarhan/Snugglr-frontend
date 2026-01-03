@@ -379,9 +379,6 @@ export default function Landing() {
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {/* Step 1 */}
               <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-bold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
-                  1
-                </div>
                 <div className="w-12 h-12 rounded-2xl bg-black text-white flex items-center justify-center mb-6 shadow-lg shadow-black/20 group-hover:scale-110 transition-transform">
                   <span className="material-symbols-outlined">school</span>
                 </div>
@@ -395,9 +392,6 @@ export default function Landing() {
 
               {/* Step 2 */}
               <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
-                  2
-                </div>
                 <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
                   <span className="material-symbols-outlined">edit_note</span>
                 </div>
@@ -411,9 +405,6 @@ export default function Landing() {
 
               {/* Step 3 */}
               <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
-                  3
-                </div>
                 <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
                   <span className="material-symbols-outlined">
                     travel_explore
@@ -429,9 +420,6 @@ export default function Landing() {
 
               {/* Step 4 */}
               <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
-                  4
-                </div>
                 <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors">
                   <span className="material-symbols-outlined">
                     chat_bubble_outline
@@ -447,9 +435,6 @@ export default function Landing() {
 
               {/* Step 5 */}
               <div className="group bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-gray-200/40 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 text-6xl font-display font-extrabold text-gray-50 opacity-50 select-none group-hover:text-pink-50 transition-colors">
-                  5
-                </div>
                 <div className="w-12 h-12 rounded-2xl bg-gray-100 text-black flex items-center justify-center mb-6 group-hover:bg-black group-hover:text-white transition-colors border border-accent/20">
                   <span className="material-symbols-outlined">favorite</span>
                 </div>

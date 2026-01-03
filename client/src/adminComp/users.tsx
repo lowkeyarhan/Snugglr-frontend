@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllUsers, deleteUser } from "../adminAPI/api";
-import { getAllCommunities } from "../adminAPI/api";
-import { getAuthToken } from "../userAPI/auth";
+import { getAllUsers, deleteUser } from "../../api/admin/api";
+import { getAllCommunities } from "../../api/admin/api";
+import { getAuthToken } from "../../api/user/auth";
 
 interface User {
   _id: string;

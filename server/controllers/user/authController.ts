@@ -1,8 +1,8 @@
-import UserModel from "../models/profile/User";
-import AllowedCollegeModel from "../models/admin/AllowedCollege";
+import UserModel from "../../models/profile/User";
+import AllowedCollegeModel from "../../models/admin/AllowedCollege";
 import bcrypt from "bcrypt";
-import { generateToken } from "../configs/jwt";
-import { generateUniqueAnonymousUsername } from "../utils/usernameGenerator";
+import { generateToken } from "../../configs/jwt";
+import { generateUniqueAnonymousUsername } from "../../utils/usernameGenerator";
 
 // register a new user
 export const registerUser = async (req, res) => {

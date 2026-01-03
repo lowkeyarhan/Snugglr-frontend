@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loginUser, registerUser } from "../userAPI/auth";
+import { loginUser, registerUser } from "../../api/user/auth";
 
 // --- Reusable UI Components ---
 

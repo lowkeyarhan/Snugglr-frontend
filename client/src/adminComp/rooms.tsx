@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { getAllChats, deleteChat } from "../adminAPI/api";
+import { getAllChats, deleteChat } from "../../api/admin/api";
 
 interface ChatParticipant {
   _id: string;

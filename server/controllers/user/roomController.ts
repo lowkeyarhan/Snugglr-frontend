@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
-import Chat from "../models/chats/ChatRoom";
-import User from "../models/profile/User";
+import Chat from "../../models/chats/ChatRoom";
+import User from "../../models/profile/User";
 
 // validate that all users belong to the same institution
 const validateSameInstitution = async (userIds: string[]): Promise<string> => {

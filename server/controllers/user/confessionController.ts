@@ -1,7 +1,7 @@
-import Confession from "../models/confessions/Confession";
-import Comment from "../models/confessions/Comment";
-import Like from "../models/confessions/Like";
-import Notification from "../models/preferences/Notification";
+import Confession from "../../models/confessions/Confession";
+import Comment from "../../models/confessions/Comment";
+import Like from "../../models/confessions/Like";
+import Notification from "../../models/preferences/Notification";
 
 // create a new confession
 export const createConfession = async (req, res) => {
