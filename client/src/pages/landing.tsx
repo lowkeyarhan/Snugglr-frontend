@@ -66,15 +66,15 @@ export default function Landing() {
             <nav className="hidden md:flex gap-8">
               <a
                 className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
-                href="#how-it-works"
-              >
-                How it Works
-              </a>
-              <a
-                className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
                 href="#safety"
               >
                 Safety
+              </a>
+              <a
+                className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
+                href="#flow"
+              >
+                Flow
               </a>
               <a
                 className="text-sm font-display font-bold text-gray-500 hover:text-black transition-colors tracking-tight"
@@ -84,12 +84,6 @@ export default function Landing() {
               </a>
             </nav>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate("/auth")}
-                className="text-sm font-display font-extrabold text-gray-900 hover:text-primary transition-colors hidden sm:block tracking-tight"
-              >
-                Log in
-              </button>
               <button
                 onClick={() => navigate("/auth")}
                 className="bg-black hover:bg-gray-800 text-white px-6 py-2.5 rounded-full text-sm font-display font-extrabold transition-all transform hover:scale-105 tracking-tight"
@@ -179,7 +173,10 @@ export default function Landing() {
         </section>
 
         {/* Why Snugglr Section */}
-        <section className="bg-gray-50 py-24 border-y rounded-bubble border-gray-100">
+        <section
+          className="bg-gray-50 py-24 border-y rounded-bubble border-gray-100"
+          id="safety"
+        >
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center max-w-2xl mx-auto mb-16 fade-in-up">
               <h2 className="text-3xl lg:text-4xl font-display font-extrabold mb-4 tracking-tight">
@@ -238,7 +235,7 @@ export default function Landing() {
         </section>
 
         {/* How it Works Section */}
-        <section className="py-24 overflow-hidden" id="how-it-works">
+        <section className="py-24 overflow-hidden" id="flow">
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex flex-col lg:flex-row gap-16 items-center">
               <div className="lg:w-1/2 fade-in-up">
@@ -334,14 +331,11 @@ export default function Landing() {
                       <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-lg">
                         <div className="flex items-center gap-2 mb-1">
                           <h5 className="font-display font-extrabold text-lg tracking-tight">
-                            Mystery Student
+                            StellarWizard said hi👋
                           </h5>
-                          <span className="bg-primary/10 text-primary text-[10px] px-2 py-0.5 rounded-full font-display font-extrabold">
-                            98% Match
-                          </span>
                         </div>
                         <p className="text-xs text-gray-500 font-body">
-                          Junior • Art History • 0.5 miles away
+                          Junior • he/him
                         </p>
                       </div>
                     </div>
@@ -366,7 +360,7 @@ export default function Landing() {
         </section>
 
         {/* The Journey Section */}
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-white" id="community">
           <div className="max-w-7xl mx-auto px-6">
             <div className="text-center mb-12 fade-in-up">
               <h2 className="text-3xl md:text-4xl font-display font-extrabold mb-6 tracking-[-0.02em]">
@@ -456,7 +450,7 @@ export default function Landing() {
               <div className="absolute inset-0 opacity-60">
                 <img
                   alt="Campus Life"
-                  className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
+                  className="w-full h-full object-cover transition-transform duration-1000"
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkMDS5Evx1RgqXhP_CJVz1cD1w--n4xyWl1Aud4J0YNfYD29CVbEoUsRYof3AI5ZsYjvKPB0efnaRV4tJ83Z1p5rO0qNMuUEVVZuCckAzVxl51NZA9dOPpu8V4qJe1s1CFEMqBfWPZFdknY6nagLq2_D3dGof1xTxLi7_jWjQtjsDjAu0cc64Q94bcr2jh6ydJbluau1IkADeQjQbkWRBTueB-R0PtEf5dvYzrk5zuQxnOtul1lFs77QVWoiQ5mUmN5rL5wg4OIQEq"
                 />
               </div>
@@ -557,9 +551,6 @@ export default function Landing() {
             <div className="flex flex-col md:flex-row justify-between gap-16 mb-16 border-b border-gray-800 pb-16">
               <div className="max-w-sm">
                 <div className="flex items-center gap-2 mb-6">
-                  <span className="material-symbols-outlined text-white text-2xl">
-                    favorite
-                  </span>
                   <span className="text-2xl font-pacifico tracking-[-0.02em]">
                     Snugglr
                   </span>
@@ -573,13 +564,19 @@ export default function Landing() {
                     className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
                     href="#"
                   >
-                    <span className="text-xs font-display font-bold"></span>
+                    <i
+                      className="fa-brands fa-instagram text-base"
+                      aria-hidden="true"
+                    />
                   </a>
                   <a
                     className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
                     href="#"
                   >
-                    <span className="text-xs font-display font-bold">X</span>
+                    <i
+                      className="fa-brands fa-twitter text-base"
+                      aria-hidden="true"
+                    />
                   </a>
                   <a
                     className="w-10 h-10 rounded-full bg-gray-900 flex items-center justify-center text-white hover:bg-white hover:text-black transition-colors"
@@ -610,7 +607,7 @@ export default function Landing() {
                     className="text-sm text-gray-300 hover:text-white transition-colors font-body"
                     href="#"
                   >
-                    Download
+                    User data
                   </a>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -633,7 +630,7 @@ export default function Landing() {
                     className="text-sm text-gray-300 hover:text-white transition-colors font-body"
                     href="#"
                   >
-                    Press
+                    Blog
                   </a>
                 </div>
                 <div className="flex flex-col gap-4">
@@ -656,9 +653,9 @@ export default function Landing() {
               </div>
             </div>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-600 font-body">
-              <p>© 2024 Snugglr Inc. All rights reserved.</p>
+              <p>© 2026 Snugglr. All rights reserved.</p>
               <div className="flex items-center gap-6">
-                <span>Made with ♥ on Campus</span>
+                <span>Made with ♥ by Arhan</span>
               </div>
             </div>
           </div>
