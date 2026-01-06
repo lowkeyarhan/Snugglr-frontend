@@ -37,12 +37,6 @@ const chatSchema = new mongoose.Schema(
       index: true,
     },
 
-    openingMoveSession: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "OpeningMoveSession",
-      default: null,
-    },
-
     expiresAt: {
       type: Date,
       default: null,

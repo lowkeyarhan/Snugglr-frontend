@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUserChats, getChatRoom } from "../controllers/chatroomController";
+import { getUserChats, getChatRoom } from "../controllers/user/chatroomController";
 import authMiddleware from "../middleware/authMiddleware";
 
 const router = Router();

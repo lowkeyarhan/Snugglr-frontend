@@ -124,7 +124,6 @@ export const getChatRoom = async (req: Request, res: Response) => {
         status: chat.status,
         anonymous: chat.anonymous,
         expiresAt: chat.expiresAt,
-        openingMoveSession: chat.openingMoveSession,
       },
     });
   } catch (error: any) {

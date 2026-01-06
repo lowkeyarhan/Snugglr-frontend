@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import MatchPool from "../../models/matches/MatchPool";
 import Match from "../../models/matches/Match";
 import ChatRoom from "../../models/chats/ChatRoom";
-import OpeningMoveSession from "../../models/matches/OpeningMove";
 import Notification from "../../models/preferences/Notification";
 
 // try to match a user with another user in the pool
@@ -53,23 +52,13 @@ export const tryMatch = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Failed to create chat" });
   }
 
-  // create a new opening move session for the chat room
-  const openingMove = await OpeningMoveSession.create({
-    chatRoomId: chat._id,
-    expiresAt: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
-  });
-
-  // set the opening move session for the chat room
-  chat.openingMoveSession = openingMove._id;
-  await chat.save();
-
   // notify both users about the match
   await Notification.insertMany([
     {
       user: me.user,
       type: "match",
       title: "It’s a match 👀",
-      body: "You matched with someone from your college",
+      body: "Someone from your college is in the same mood",
       actionUrl: `/chat/${chat._id}`,
       relatedUser: other.user,
     },
@@ -77,7 +66,7 @@ export const tryMatch = async (req: Request, res: Response) => {
       user: other.user,
       type: "match",
       title: "It’s a match 👀",
-      body: "You matched with someone from your college",
+      body: "You matched with someone, want to make the first move?",
       actionUrl: `/chat/${chat._id}`,
       relatedUser: me.user,
     },

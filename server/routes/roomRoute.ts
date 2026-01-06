@@ -6,9 +6,8 @@ import {
   getChatById,
   addUserToGroup,
   removeUserFromGroup,
-} from "../controllers/roomController";
+} from "../controllers/user/roomController";
 import authMiddleware from "../middleware/authMiddleware";
-import swaggerJSDoc from "swagger-jsdoc";
 
 const router = Router();
 

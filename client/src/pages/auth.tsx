@@ -209,16 +209,14 @@ export default function Auth() {
     setStatus({ loading: true, error: null, success: false });
 
     try {
-      const payload = isSignUp
-        ? { email: form.email, password: form.password }
-        : {
+      const result = isSignUp
+        ? await registerUser({ email: form.email, password: form.password })
+        : await loginUser({
             password: form.password,
             ...(method === "email"
               ? { email: form.email }
               : { phoneNumber: form.phoneNumber }),
-          };
-      const action = isSignUp ? registerUser : loginUser;
-      const result = await action(payload);
+          });
 
       if (result.data) {
         localStorage.setItem("token", result.data.token);

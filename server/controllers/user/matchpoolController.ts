@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import MatchPool from "../../models/matches/MatchPool";
 import Match from "../../models/matches/Match";
 import ChatRoom from "../../models/chats/ChatRoom";
-import OpeningMoveSession from "../../models/matches/OpeningMove";
 import Notification from "../../models/preferences/Notification";
 
 /**
@@ -102,13 +101,6 @@ export const tryMatch = async (req: Request, res: Response) => {
     expiresAt,
   });
 
-  // create opening move session
-  const openingMove = await OpeningMoveSession.create({
-    chatRoomId: chat._id,
-    expiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 mins to choose
-  });
-
-  chat.openingMoveSession = openingMove._id;
   await chat.save();
 
   // notify both users AFTER match exists

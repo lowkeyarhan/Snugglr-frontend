@@ -54,10 +54,10 @@ export default function NotificationsPane() {
     },
   ];
 
-  const trending = [
-    { id: "1", name: "Starbucks", count: "84 people here", icon: "☕" },
-    { id: "2", name: "Main Library", count: "62 people here", icon: "📚" },
-  ];
+  // const trending = [
+  //   { id: "1", name: "Starbucks", count: "84 people here", icon: "☕" },
+  //   { id: "2", name: "Main Library", count: "62 people here", icon: "📚" },
+  // ];
 
   const match = {
     user: "Alex",
@@ -123,35 +123,6 @@ export default function NotificationsPane() {
                 Reveal now
               </button>
             </div>
-          </div>
-        </div>
-
-        {/* Trending Section */}
-        <div className="px-4 py-4 border-b border-gray-100 dark:border-gray-800">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs text-gray-400 uppercase tracking-wider">
-              Trending
-            </span>
-          </div>
-          <div className="space-y-2">
-            {trending.map((item) => (
-              <button
-                key={item.id}
-                className="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-white/60 dark:hover:bg-white/5 transition-colors group"
-              >
-                <div className="w-10 h-10 rounded-2xl bg-white/70 dark:bg-white/5 border border-black/5 dark:border-white/5 flex items-center justify-center text-lg shadow-[6px_6px_12px_rgba(0,0,0,0.06),_-6px_-6px_12px_rgba(255,255,255,0.8)] dark:shadow-[6px_6px_12px_rgba(0,0,0,0.55),_-6px_-6px_12px_rgba(255,255,255,0.03)]">
-                  {item.icon}
-                </div>
-                <div className="flex-1 text-left">
-                  <p className="text-gray-900 dark:text-white text-sm">
-                    {item.name}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-xs">
-                    {item.count}
-                  </p>
-                </div>
-              </button>
-            ))}
           </div>
         </div>
 

@@ -116,12 +116,6 @@ export default function Sidebar({
       {/* Profile card */}
       {!collapsed ? (
         <div className="flex flex-col gap-4 p-4 border-t border-gray-100 dark:border-gray-800">
-          <button className="w-full flex items-center justify-center gap-2 bg-black shadow-lg shadow-black/30 text-white p-3.5 rounded-2xl transition-all duration-200 hover:scale-[1.02]">
-            <span className="text-sm font-bold tracking-wide">Go Premium</span>
-            <span className="material-symbols-outlined text-[20px]">
-              arrow_forward
-            </span>
-          </button>
           <div
             onClick={() => navigate("/profile")}
             className="flex items-center gap-4 px-4 py-3 cursor-pointer rounded-full select-none bg-[#f1f3f8] dark:bg-[#1c1d23] border border-black/5 dark:border-white/5 shadow-[10px_10px_20px_rgba(0,0,0,0.08),_-10px_-10px_20px_rgba(255,255,255,0.9)] dark:shadow-[10px_10px_20px_rgba(0,0,0,0.55),_-10px_-10px_20px_rgba(255,255,255,0.04)] hover:shadow-[12px_12px_22px_rgba(0,0,0,0.10),_-12px_-12px_22px_rgba(255,255,255,0.95)] dark:hover:shadow-[12px_12px_22px_rgba(0,0,0,0.60),_-12px_-12px_22px_rgba(255,255,255,0.05)] transition-shadow duration-300"

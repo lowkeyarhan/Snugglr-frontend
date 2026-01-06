@@ -7,7 +7,7 @@ import {
   replyToComment,
   likeComment,
   getCommentsForConfession,
-} from "../controllers/confessionController";
+} from "../controllers/user/confessionController";
 import authMiddleware from "../middleware/authMiddleware";
 
 const router = Router();

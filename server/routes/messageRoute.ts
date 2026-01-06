@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { getMessages, sendMessage } from "../controllers/messageController";
+import {
+  getMessages,
+  sendMessage,
+} from "../controllers/user/messageController";
 import authMiddleware from "../middleware/authMiddleware";
-import swaggerJSDoc from "swagger-jsdoc";
 
 const router = Router();
 

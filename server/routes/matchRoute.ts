@@ -5,8 +5,7 @@ import {
   joinMatchPool,
   leaveMatchPool,
   tryMatch,
-} from "../controllers/matchpoolController";
-import { submitOpeningMove } from "../controllers/openingmoveController";
+} from "../controllers/user/matchpoolController";
 
 const router = Router();
 
@@ -230,85 +229,5 @@ router.post("/pool/join", authMiddleware, joinMatchPool);
  *         description: Internal server error
  */
 router.post("/pool/leave", authMiddleware, leaveMatchPool);
-
-/**
- * @swagger
- * /match/opening-move:
- *   post:
- *     summary: Submit an opening move choice for a locked chat
- *     description: |
- *       Submits an opening move choice for a LOCKED chat room.
- *       When both users submit their choices, the chat room status changes to ACTIVE.
- *       Opening move sessions expire after 5 minutes.
- *     tags: [Matches]
- *     security:
- *       - BearerAuth: []
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - chatId
- *               - choice
- *             properties:
- *               chatId:
- *                 type: string
- *                 description: The chat room ID
- *                 example: "507f1f77bcf86cd799439011"
- *               choice:
- *                 type: string
- *                 description: The opening move choice selected by the user
- *                 example: "option1"
- *     responses:
- *       200:
- *         description: Opening move submitted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *                   example: true
- *       400:
- *         description: Bad request - Chat not locked or invalid request
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   examples:
- *                     chatNotLocked: "Chat not locked"
- *                     sessionExpired: "Session expired"
- *       403:
- *         description: Forbidden - User is not part of this chat
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Not your chat"
- *       404:
- *         description: Opening move session not found or expired
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Session expired"
- *       401:
- *         description: Unauthorized - Invalid or missing token
- *       500:
- *         description: Internal server error
- */
-router.post("/opening-move", authMiddleware, submitOpeningMove);
 
 export default router;
